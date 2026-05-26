@@ -36,12 +36,15 @@ Pemeriksaan berikut perlu dilakukan sebelum melanjutkan ke langkah eksekusi:
 | Node.js dan npm terpasang | Jalankan `node --version` dan `npm --version` pada cmd |
 | Akses internet ke registry npm | Konfirmasi koneksi internet tersedia untuk download package dari registry |
 | Folder root project dapat diakses dan writable | Folder `<root-project>` dapat diakses dan memiliki permission tulis |
+| PostgreSQL server terpasang dan dapat diakses | Jalankan `psql --version` pada cmd untuk memastikan PostgreSQL terpasang, serta tersedia host, port, user, dan password yang siap digunakan. Item ini bersifat antisipatif: tidak digunakan pada Skenario 1, namun akan dibutuhkan mulai Skenario 2 untuk validasi koneksi database |
 
 Keterangan placeholder:
 
 - `<root-project>` merujuk pada folder root playbook tempat seluruh aktivitas onboarding dilakukan. Resolusi path absolut dipegang oleh user dan tidak ditulis pada dokumen.
 
 Catatan: handbook tidak menetapkan versi minimum Node.js secara eksplisit. Jika ditemukan error kompatibilitas saat instalasi, hentikan eksekusi dan dokumentasikan permasalahan sebelum mencari solusi alternatif.
+
+Catatan PostgreSQL: instalasi PostgreSQL berada di luar scope playbook ini. Installer resmi tersedia pada [https://www.postgresql.org/download/](https://www.postgresql.org/download/). Penyiapan PostgreSQL sebelum Skenario 1 selesai akan mencegah interupsi onboarding saat memasuki Skenario 2.
 
 ---
 

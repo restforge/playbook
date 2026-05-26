@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pub-6096676046da426597041567e928006f.r2.dev)",
+      "Bash(where psql *)",
+      "Bash(PGPASSWORD=postgres1234 psql -h 127.0.0.1 -p 5432 -U postgres -d dbdemo -c \"SELECT visitor_id, name, phone, email, length\\(email\\) as email_len FROM visitors ORDER BY created_at DESC LIMIT 10;\")"
+    ]
+  }
+}

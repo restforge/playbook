@@ -1,0 +1,168 @@
+# Skenario 9: Menjalankan Aplikasi Frontend dan Verifikasi GET Visitors
+
+> Tahap kesembilan onboarding RESTForge. Menjalankan aplikasi frontend hasil generate Skenario 8 bersamaan dengan backend server, lalu memverifikasi bahwa halaman `visitors` dapat memuat data dari backend API melalui browser.
+
+---
+
+## Tujuan (Objective)
+
+1. Backend server RESTForge running di port `3000` dari workspace `sandbox\backend`
+2. Aplikasi frontend running di port `8000` dari workspace `sandbox\frontend\apps\visitors-app`
+3. Halaman `visitors.html` di browser memuat list visitors melalui call ke endpoint backend `http://127.0.0.1:3000/api/myapp/visitors`
+
+---
+
+## Prasyarat (Prerequisite)
+
+| Item | Cara Verifikasi |
+|------|-----------------|
+| Skenario 8 selesai | Folder `sandbox\frontend\apps\visitors-app\` berisi `index.html`, `visitors.html`, `app-start.bat`, folder `js\`, `css\` |
+| Port `3000` dan `8000` tersedia | `netstat -ano \| findstr :3000` dan `netstat -ano \| findstr :8000` tidak menampilkan entri `LISTENING` |
+| Browser tersedia | Chrome, Edge, Firefox, atau browser modern lainnya |
+
+---
+
+## Langkah Eksekusi (Execution Steps)
+
+### Langkah 1: Start Backend Server
+
+Pada jendela cmd pertama, pindah ke workspace backend lalu jalankan runtime server:
+
+```bat
+cd playbook\sandbox\backend
+npx restforge serve --project=myapp --config=db-connection.env
+```
+
+Server harus start tanpa error fatal dan menampilkan log `[OK] Server ready on port 3000`. Biarkan jendela cmd ini tetap terbuka selama Skenario 9 berjalan.
+
+---
+
+### Langkah 2: Start Aplikasi Frontend
+
+Buka **jendela cmd kedua** (jangan tutup cmd backend). Pindah ke folder aplikasi frontend lalu jalankan `app-start.bat`:
+
+```bat
+cd playbook\sandbox\frontend\apps\visitors-app
+app-start.bat
+```
+
+Output yang diharapkan:
+
+```
+Starting application...
+Open http://localhost:8000/index.html in your browser
+```
+
+Selanjutnya `npx serve` akan menampilkan log siap-melayani pada port `8000`. Biarkan jendela cmd ini juga tetap terbuka.
+
+---
+
+### Langkah 3: Verifikasi GET Visitors di Browser
+
+Buka browser, akses URL berikut:
+
+```
+http://localhost:8000/index.html
+```
+
+Halaman homepage aplikasi harus tampil. Navigasikan ke halaman `Visitors` (link tersedia pada homepage), atau akses langsung:
+
+```
+http://localhost:8000/visitors.html
+```
+
+Verifikasi kondisi berikut pada halaman `Visitors`:
+
+| Aspek | Kondisi |
+|-------|---------|
+| Tabel data | Ter-render dengan kolom `Name`, `Email`, `Phone` (sesuai UDF `visitors.json`) |
+| Pemanggilan API | Tab Network di DevTools (F12) menampilkan request ke `http://127.0.0.1:3000/api/myapp/visitors` dengan response status `200` |
+| Data ter-load | Jika data visitors sudah ada (mis. hasil Create dari Skenario 7), list muncul di tabel. Jika belum ada data, tabel menampilkan pesan empty state tanpa error |
+| Console browser | Tab Console di DevTools tidak menampilkan error fatal (mis. `Failed to fetch`, `CORS error`) |
+
+#### Pengujian CRUD Mandiri via Aplikasi Web
+
+Setelah halaman `Visitors` berhasil ter-render dengan data, lanjutkan dengan pengujian operasi CRUD (Create, Read, Update, Delete) secara mandiri langsung melalui aplikasi web yang sudah terbuka di browser. Tujuannya adalah memvalidasi end-to-end integrasi frontend ke backend pada seluruh action endpoint, bukan hanya `GET/datatables`.
+
+Skenario pengujian yang disarankan:
+
+| Action | Langkah Pengujian | Verifikasi Hasil |
+|--------|-------------------|------------------|
+| Create | Klik tombol **Add** atau **Create** pada halaman `Visitors`. Isi form dengan data baru (`Name`, `Email`, `Phone`) lalu submit | Record baru muncul di tabel tanpa reload manual; tab Network menampilkan request `POST /api/myapp/visitors/create` dengan response `success: true` |
+| Read (detail) | Klik salah satu baris record (atau tombol **View**/**Detail**) untuk melihat detail | Form detail menampilkan nilai `Name`, `Email`, `Phone` sesuai record; tab Network menampilkan request `POST /api/myapp/visitors/first` atau `/read` dengan response `200` |
+| Update | Klik tombol **Edit** pada baris record yang sudah ada. Ubah salah satu field (mis. `Name` atau `Phone`) lalu submit | Nilai record di tabel ter-update tanpa reload; tab Network menampilkan request `POST /api/myapp/visitors/update` dengan response `success: true` |
+| Delete | Klik tombol **Delete** pada baris record. Konfirmasi dialog hapus apabila tersedia | Record hilang dari tabel; tab Network menampilkan request `POST /api/myapp/visitors/delete` dengan response `deleted_count: 1` |
+
+Verifikasi tambahan selama pengujian CRUD:
+
+- Tab **Console** browser tetap bersih tanpa error JavaScript fatal
+- Tab **Network** browser menampilkan seluruh request CRUD dengan response status `200`/`201` (bukan `4xx`/`5xx`)
+- Validasi sisi frontend (mis. field wajib, format email) berfungsi dan menampilkan pesan inline ketika input tidak valid
+- Validasi sisi backend (mis. duplicate email apabila ada unique constraint) menghasilkan response error yang ditangani oleh frontend (mis. alert/toast)
+- Setelah operasi Create dan Delete, refresh halaman untuk memastikan data persisten di database (bukan hanya state in-memory frontend)
+
+Catatan: layout dan label tombol CRUD pada aplikasi hasil generate mengikuti template default RESTForge Designer. Apabila ditemukan tombol action belum tersedia atau perlu kustomisasi tambahan (mis. konfirmasi delete, success notification), kustomisasi dilakukan via editing manual UDF (`sandbox\frontend\payload\visitors.json`) lalu regenerate aplikasi via `restforge-designer generate --overwrite`.
+
+---
+
+### Langkah 4: Stop Aplikasi dan Backend Server
+
+Stop aplikasi frontend pada cmd kedua via:
+
+```
+Ctrl + C
+```
+
+Stop backend server pada cmd pertama via:
+
+```
+Ctrl + C
+```
+
+Verifikasi kedua port kembali tersedia:
+
+```bat
+netstat -ano | findstr :3000
+netstat -ano | findstr :8000
+```
+
+Kedua command harus mengembalikan output kosong.
+
+---
+
+## Kriteria Selesai (Completion Criteria)
+
+| Item | Kondisi |
+|------|---------|
+| Backend server | Start dari `sandbox\backend` tanpa error, listening pada port `3000` |
+| Aplikasi frontend | Start dari `sandbox\frontend\apps\visitors-app` via `app-start.bat`, listening pada port `8000` |
+| Homepage | `http://localhost:8000/index.html` dapat dibuka di browser |
+| Halaman visitors | `http://localhost:8000/visitors.html` menampilkan tabel dengan kolom `Name`, `Email`, `Phone` |
+| Integrasi API | Request ke `http://127.0.0.1:3000/api/myapp/visitors` mengembalikan status `200` di tab Network DevTools |
+| Stop | Kedua process berhasil di-stop, port `3000` dan `8000` kembali tersedia |
+
+---
+
+## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
+
+Skenario 9 menutup track onboarding RESTForge end-to-end (backend + frontend). Pengembangan lanjutan seperti pengujian operasi CRUD lengkap dari aplikasi frontend (Create, Update, Delete), validasi field, dan handling response error dari backend dapat dieksplorasi dengan mereferensikan handbook RESTForge sesuai topik (master-detail, processor, dashboard, dll.).
+
+---
+
+## Pelaporan Issue (Issue Reporting)
+
+Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta:
+
+- Nomor langkah saat error terjadi
+- Output lengkap perintah yang gagal pada cmd backend atau cmd frontend
+- Screenshot tab Console dan tab Network browser DevTools (jika error terjadi di halaman browser)
+- Output `netstat -ano | findstr :3000` dan `netstat -ano | findstr :8000`
+
+Issue umum yang patut diperiksa:
+
+| Gejala | Area Verifikasi |
+|--------|----------------|
+| Tabel kosong tanpa error | Apakah ada data visitors di database? Verifikasi via curl pada Skenario 7 |
+| `Failed to fetch` di Console | Apakah backend server running? Apakah `apiBaseUrl` di UDF sesuai dengan host:port backend? |
+| `CORS error` di Console | Apakah backend mengizinkan request dari `http://localhost:8000`? Verifikasi konfigurasi CORS di backend |
+| Port `8000` sudah terpakai | Stop process lain yang memakai port tersebut, atau ubah `appConfig.port` di UDF lalu regenerate |

@@ -1,0 +1,52 @@
+# Sandbox: workspace eksekusi playbook
+# Seluruh isi folder sandbox di-ignore agar tiap developer dapat
+# mengeksekusi skenario secara independen tanpa konflik artefak.
+# File README.md di dalam sandbox tetap di-track untuk dokumentasi.
+sandbox/*
+!sandbox/README.md
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Build output & cache
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.turbo/
+
+# Logs
+logs/
+*.log
+
+# Editor & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code local settings
+.claude/settings.local.json

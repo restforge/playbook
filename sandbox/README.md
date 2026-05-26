@@ -67,9 +67,10 @@ Setelah Skenario 1 selesai, folder ini akan berisi struktur dasar workspace yang
 
 Untuk memulai playbook dari kondisi bersih, hapus folder `backend/` dan `frontend/` di dalam sandbox:
 
-```powershell
-# Windows PowerShell
-Remove-Item -Recurse -Force backend, frontend -ErrorAction SilentlyContinue
+```cmd
+:: Windows CMD
+rmdir /S /Q backend
+rmdir /S /Q frontend
 ```
 
 ```bash

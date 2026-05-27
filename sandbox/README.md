@@ -86,4 +86,3 @@ Setelah reset, eksekusi dapat dimulai kembali dari Skenario 1.
 
 - Landing page playbook: [../README.md](../README.md)
 - Daftar lengkap skenario: [../scenarios/](../scenarios/)
-- Konfigurasi ignore: [../.gitignore](../.gitignore)

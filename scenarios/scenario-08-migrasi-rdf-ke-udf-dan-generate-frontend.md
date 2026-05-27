@@ -31,6 +31,8 @@
 | RESTForge Designer ter-install system-level | Command `restforge-designer --version` dapat dipanggil dari working directory mana saja |
 | License key tersedia | Format `XXXX-XXXX-XXXX-XXXX` (4 segmen, masing-masing 4 karakter uppercase A-Z atau 0-9) |
 
+Catatan instalasi RESTForge Designer: installer resmi tersedia pada [https://restforge.dev/download.html](https://restforge.dev/download.html). Pada halaman tersebut, pilih card **RESTForge Designer** lalu klik tombol **Download for Windows (x64)** untuk mengunduh Desktop Installer (.exe). Jalankan installer hingga selesai, kemudian verifikasi melalui command `restforge-designer --version` sebelum melanjutkan ke langkah eksekusi.
+
 ---
 
 ## Langkah Eksekusi (Execution Steps)

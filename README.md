@@ -2,7 +2,7 @@
 
 > Panduan onboarding praktis untuk mempelajari RESTForge dari nol hingga aplikasi full-stack berjalan di browser.
 
-Repository ini berisi kumpulan skenario terstruktur yang membimbing developer melalui seluruh alur kerja RESTForge: instalasi, definisi schema, generate endpoint backend, hingga generate aplikasi frontend. Setiap skenario disusun sebagai modul mandiri yang dapat dieksekusi secara berurutan dari Skenario 1 sampai Skenario 12.
+Repository ini berisi kumpulan skenario terstruktur yang membimbing developer melalui seluruh alur kerja RESTForge: instalasi, definisi schema, generate endpoint backend, hingga generate aplikasi frontend. Setiap skenario disusun sebagai modul mandiri yang dapat dieksekusi secara berurutan dari Skenario 1 sampai Skenario 13.
 
 ---
 
@@ -34,6 +34,7 @@ Target akhir playbook adalah kondisi sebagai berikut:
 | 10 | Tabel visitor_categories dari SDF hingga Endpoint | Tabel `visitor_categories` ter-create, endpoint REST aktif |
 | 11 | Revisi visitors dengan JOIN ke visitor_categories | Kolom FK `category_id` ditambah, endpoint `visitors` menampilkan `category_name` |
 | 12 | Aplikasi Frontend Multi-Page visitor_categories dan visitors | Satu app multi-page (Categories + Visitors) dengan dropdown kategori dari endpoint lookup |
+| 13 | Update UDF dan Generate Ulang Per-Page dan Penuh | Teknik regenerate per-page (`--scope=form`) dan penuh (`--scope=app`), termasuk penanganan `index.html` |
 
 Seluruh file skenario tersedia di folder [scenarios/](scenarios/).
 
@@ -43,10 +44,10 @@ Seluruh file skenario tersedia di folder [scenarios/](scenarios/).
 
 ```
 restforge-playbook/
-├── scenarios/          Dokumentasi skenario onboarding (Skenario 1-12)
+├── scenarios/          Dokumentasi skenario onboarding (Skenario 1-13)
 ├── sandbox/            Workspace eksekusi untuk artefak hasil playbook
 │   ├── backend/        Working directory untuk Skenario 1-7, 10-11 (akan dibuat saat eksekusi)
-│   └── frontend/       Working directory untuk Skenario 8-9, 12 (akan dibuat saat eksekusi)
+│   └── frontend/       Working directory untuk Skenario 8-9, 12-13 (akan dibuat saat eksekusi)
 └── README.md           Dokumen ini
 ```
 

@@ -46,8 +46,8 @@
 Dari `sandbox\backend`, migrate kategori lebih dulu, lalu visitors. Flag `--overwrite` diperlukan karena `visitors.json` sudah ada dari Skenario 8:
 
 ```bat
-npx restforge payload migrate --name=visitor-categories.json --project=myapp --output=..\frontend\payload --config=db-connection.env --overwrite
-npx restforge payload migrate --name=visitors.json --project=myapp --output=..\frontend\payload --config=db-connection.env --overwrite
+npx restforge payload migrate --name=visitor-categories.json --project=visitors-app --output=..\frontend\payload --config=db-connection.env --overwrite
+npx restforge payload migrate --name=visitors.json --project=visitors-app --output=..\frontend\payload --config=db-connection.env --overwrite
 ```
 
 Setiap perintah menghasilkan UDF single-page (`Pages: 1`). Output `visitors` kini menyertakan `category_id`; kolom display JOIN (`category_code`, `category_name`) di-exclude dari form sesuai aturan migrasi.
@@ -63,74 +63,90 @@ cd ..\frontend\payload
 mkdir pages
 ```
 
-Hasil migrate (`visitor-categories.json`, `visitors.json`) adalah UDF lengkap berisi `appConfig` + satu `pages`. Pisahkan menjadi struktur multi-page: `appConfig` bersama ke `app-config.json`, dan tiap object page ke `pages\*.json`.
+Setiap hasil migrate berbentuk `{ "appConfig": { ... }, "pages": [ ... ] }`. Susun struktur multi-page dengan **membelah** tiap hasil migrate menjadi dua bagian, bukan menyusun ulang dari nol:
 
-**a. Buat `app-config.json`** (salin blok `appConfig` dari salah satu hasil migrate):
+- blok `appConfig` → `app-config.json` (cukup satu file, dipakai bersama semua page)
+- blok `pages` → `pages\<tabel>.json` (satu file per tabel)
+
+Karena `pages` pada hasil migrate sudah berupa array, file di `pages\` otomatis berbentuk `{ "pages": [ ... ] }` yang valid untuk `include` tanpa perlu dibungkus ulang. Loader `include` membaca array `pages` dari file yang direferensikan; file tanpa array `pages` ditolak dengan error `does not contain a valid 'pages' array`.
+
+**a. Buat `app-config.json`** — salin salah satu hasil migrate, lalu hapus blok `pages` (sisakan `appConfig`):
 
 ```json
 {
     "appConfig": {
-        "appName": "My Application",
-        "appCode": "myapp",
+        "appName": "Visitors App",
+        "appCode": "visitors-app",
         "plugin": "vanilla-js-basic",
-        "apiBaseUrl": "http://127.0.0.1:3000/api/myapp",
+        "apiBaseUrl": "http://127.0.0.1:3000/api/visitors-app",
         "port": 8000
     }
 }
 ```
 
-**b. Buat `pages\visitor-categories.json`** — salin object di dalam `pages[0]` dari hasil migrate `visitor-categories.json` (hanya object page, tanpa pembungkus `appConfig`/`pages`):
+**b. Buat `pages\visitor-categories.json`** — salin hasil migrate `visitor-categories.json`, lalu hapus blok `appConfig` (sisakan blok `pages`). Hasilnya langsung berbentuk seperti berikut:
 
 ```json
 {
-    "pageId": "visitor-categories",
-    "pageTitle": "Visitor Categories",
-    "apiPath": "visitor-categories",
-    "primaryKey": "category_id",
-    "displayField": "category_name",
-    "features": { "enableSearch": true, "fieldLayout": "vertical" },
-    "fields": [ "... hasil migrate: category_code, category_name, description, default_duration_hours, requires_escort, is_active ..." ]
-}
-```
-
-**c. Buat `pages\visitors.json`** — salin object `pages[0]` dari hasil migrate `visitors.json`, lalu konfigurasi `category_id` sebagai dropdown (lihat Langkah 3).
-
----
-
-### Langkah 3: Konfigurasi Dropdown Kategori
-
-Pada `pages\visitors.json`, pastikan field `category_id` bertipe `select` dengan `dataSource` API ke resource `visitor-categories`. Konfigurasi ini wajib agar update visitor dapat memilih kategori dari dropdown (database tidak memiliki FK constraint fisik, sehingga migrate tidak selalu menghasilkan `select` otomatis):
-
-```json
-{
-    "pageId": "visitors",
-    "pageTitle": "Visitors",
-    "apiPath": "visitors",
-    "primaryKey": "visitor_id",
-    "displayField": "name",
-    "features": { "enableSearch": true, "fieldLayout": "vertical" },
-    "fields": [
-        { "name": "name",  "label": "Name",  "type": "text", "required": true, "maxlength": 100 },
-        { "name": "email", "label": "Email", "type": "text", "required": true, "maxlength": 100 },
-        { "name": "phone", "label": "Phone", "type": "text", "required": true, "maxlength": 20 },
+    "pages": [
         {
-            "name": "category_id",
-            "label": "Category",
-            "type": "select",
-            "required": false,
-            "inTable": true,
-            "tableField": "category_name",
-            "dataSource": {
-                "type": "api",
-                "resource": "visitor-categories",
-                "select": ["category_id", "category_name"]
-            }
+            "pageId": "visitor-categories",
+            "pageTitle": "Visitor Categories",
+            "apiPath": "visitor-categories",
+            "primaryKey": "category_id",
+            "displayField": "category_name",
+            "features": { "enableSearch": true, "fieldLayout": "vertical" },
+            "fields": [ "... hasil migrate: category_code, category_name, description, default_duration_hours, requires_escort, is_active ..." ]
         }
     ]
 }
 ```
 
-`tableField: "category_name"` membuat DataTable menampilkan nama kategori (bukan UUID `category_id`). `resource: "visitor-categories"` menghasilkan request `POST /api/myapp/visitor-categories/lookup`.
+**c. Buat `pages\visitors.json`** — salin hasil migrate `visitors.json`, hapus blok `appConfig`, lalu konfigurasi `category_id` sebagai dropdown (lihat Langkah 3).
+
+---
+
+### Langkah 3: Konfigurasi Dropdown Kategori
+
+Pada `pages\visitors.json`, pastikan field `category_id` bertipe `select` dengan `dataSource` API ke resource `visitor-categories`. Konfigurasi eksplisit ini memastikan field `category_id` tampil sebagai dropdown kategori pada form sehingga update visitor dapat memilih kategori:
+
+```json
+{
+    "pages": [
+        {
+            "pageId": "visitors",
+            "pageTitle": "Visitors",
+            "apiPath": "visitors",
+            "primaryKey": "visitor_id",
+            "displayField": "name",
+            "features": { "enableSearch": true, "fieldLayout": "vertical" },
+            "fields": [
+                { "name": "name",  "label": "Name",  "type": "text", "required": true, "maxlength": 100, "inTable": true, "tableOrder": 1 },
+                { "name": "email", "label": "Email", "type": "text", "required": true, "maxlength": 100, "inTable": true, "tableOrder": 2 },
+                { "name": "phone", "label": "Phone", "type": "text", "required": true, "maxlength": 20, "inTable": true, "tableOrder": 3 },
+                {
+                    "name": "category_id",
+                    "label": "Category",
+                    "type": "select",
+                    "required": false,
+                    "inTable": true,
+                    "tableOrder": 4,
+                    "tableField": "category_name",
+                    "dataSource": {
+                        "type": "api",
+                        "resource": "visitor-categories",
+                        "select": ["category_id", "category_name"]
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
+
+`tableField: "category_name"` membuat DataTable menampilkan nama kategori (bukan UUID `category_id`). `resource: "visitor-categories"` menghasilkan request `POST /api/visitors-app/visitor-categories/lookup`.
+
+> **Penting (perilaku `inTable`):** default `inTable` adalah `false`. Selama tidak ada satu pun field ber-`inTable`, DataTable menampilkan seluruh field (mode fallback). Namun begitu satu field diberi `inTable: true`, tabel beralih ke mode opt-in: **hanya** field ber-`inTable: true` yang muncul sebagai kolom. Karena itu `name`, `email`, dan `phone` wajib diberi `inTable: true` + `tableOrder` juga; bila tidak, grid hanya menampilkan kolom `Category` (kolom lain hilang) meskipun data lengkap ada di response API. Setiap field ber-`inTable: true` sebaiknya disertai `tableOrder` agar urutan kolom terprediksi dan tidak memunculkan warning.
 
 ---
 
@@ -168,13 +184,14 @@ Validasi harus lolos tanpa error. Error `pageRef ... does not match any pageId` 
 
 ### Langkah 5: Generate Aplikasi Frontend
 
-Dari `sandbox\frontend`:
+Dari `sandbox\frontend`. Hapus dulu `index.html` lama hasil Skenario 8 sebelum generate, karena `--overwrite` menimpa file page (HTML/JS) tetapi tidak meregenerasi `index.html` yang sudah ada:
 
 ```bat
+del apps\visitors-app\index.html
 restforge-designer generate --payload=payload/visitors-app.json --output=./apps/visitors-app --overwrite
 ```
 
-Flag `--overwrite` menimpa folder `visitors-app` dari Skenario 8 (sebelumnya single-page `visitors`) menjadi aplikasi multi-page.
+Tanpa menghapus `index.html`, landing page lama (single-page, hanya card `Visitors`) akan tetap muncul karena generator tidak menimpa `index.html` yang sudah ada. Setelah dihapus, generator membuat ulang `index.html` sebagai landing multi-page berisi card `Visitor Categories` dan `Visitors`. Flag `--overwrite` sendiri menimpa file page `visitors` dari Skenario 8 dan menambahkan page `visitor-categories`.
 
 Verifikasi hasil:
 
@@ -188,14 +205,20 @@ Output memuat shared files (`index.html`, `app-start.bat`, folder `js\`, `css\`)
 
 ### Langkah 6: Run dan Verifikasi Berurutan
 
-Start backend pada cmd pertama:
+Pastikan backend server running pada cmd pertama. Skenario 12 hanya mengubah frontend; endpoint backend (`visitors` dan `visitor-categories`) sudah final sejak Skenario 10-11, sehingga server cukup dipastikan aktif di port `3000`, bukan di-refresh:
+
+```bat
+netstat -ano | findstr :3000
+```
+
+Output harus menampilkan entri `LISTENING`. Bila belum, jalankan backend mengikuti Skenario 6 Langkah 4:
 
 ```bat
 cd playbook\sandbox\backend
-npx restforge serve --project=myapp --config=db-connection.env
+npx restforge serve --project=visitors-app --config=db-connection.env
 ```
 
-Log menampilkan `Loading 2 endpoint(s)` dan `[OK] Server ready on port 3000`.
+Server yang aktif menampilkan log `Loading 2 endpoint(s)` (`visitors` + `visitor_categories`) dan `[OK] Server ready on port 3000`.
 
 Start frontend pada cmd kedua:
 
@@ -210,9 +233,9 @@ Verifikasi berurutan (urutan tidak boleh dibalik):
 
 | Urutan | Langkah | Verifikasi |
 |--------|---------|------------|
-| 1 | Buka **Visitor Categories** → Create kategori (mis. `category_code=VIP`, `category_name=VIP Guest`) → submit | Record muncul di tabel; Network: `POST /api/myapp/visitor-categories/create` → `success: true` |
-| 2 | Buka **Visitors** → Create/Edit visitor → buka dropdown **Category** | Dropdown memuat kategori dari langkah 1; Network: `POST /api/myapp/visitor-categories/lookup` → `200` |
-| 3 | Pilih kategori → submit | Network: `POST /api/myapp/visitors/create` (atau `/update`) → `success: true` |
+| 1 | Buka **Visitor Categories** → Create kategori (mis. `category_code=VIP`, `category_name=VIP Guest`) → submit | Record muncul di tabel; Network: `POST /api/visitors-app/visitor-categories/create` → `success: true` |
+| 2 | Buka **Visitors** → Create/Edit visitor → buka dropdown **Category** | Dropdown memuat kategori dari langkah 1; Network: `POST /api/visitors-app/visitor-categories/lookup` → `200` |
+| 3 | Pilih kategori → submit | Network: `POST /api/visitors-app/visitors/create` (atau `/update`) → `success: true` |
 | 4 | Amati tabel **Visitors** | Kolom **Category** menampilkan `category_name` terisi (bukan UUID) |
 
 Catatan urutan: dropdown kategori kosong apabila belum ada record `visitor_categories`. Tambah kategori (langkah 1) wajib dilakukan sebelum create/update visitor.
@@ -234,7 +257,7 @@ Stop frontend (cmd kedua) dan backend (cmd pertama) via `Ctrl + C`.
 | Field dropdown | `category_id` pada `pages\visitors.json` bertipe `select` dengan `dataSource` API `resource: visitor-categories` |
 | Aplikasi | `sandbox\frontend\apps\visitors-app` berisi `index.html`, `visitor-categories.html`, `visitors.html`, `app-start.bat` |
 | Sidebar | Menampilkan link **Visitor Categories** dan **Visitors** |
-| Dropdown runtime | Halaman Visitors memuat opsi kategori via `POST /api/myapp/visitor-categories/lookup` (`200`) |
+| Dropdown runtime | Halaman Visitors memuat opsi kategori via `POST /api/visitors-app/visitor-categories/lookup` (`200`) |
 | End-to-end | Visitor dengan kategori tersimpan; tabel Visitors menampilkan `category_name` |
 
 ---

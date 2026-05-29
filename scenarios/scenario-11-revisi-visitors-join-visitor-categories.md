@@ -7,7 +7,7 @@
 ## Tujuan (Objective)
 
 1. SDF `schema\visitors.js` ditambah field FK `category_id` dan lolos `schema validate`
-2. Kolom `category_id` ter-tambah ke tabel `visitors` via `schema apply` (data existing tetap aman)
+2. Kolom `category_id`, index, dan FK constraint ke `visitor_categories` ter-tambah ke tabel `visitors` via `schema apply` (additive, data existing tetap aman)
 3. RDF `payload\visitors.json` di-generate ulang lalu dilengkapi kolom `category_code` & `category_name` pada `fieldName`, serta property `datatablesQuery`, `viewQuery`, dan `datatablesWhere` untuk JOIN ke `visitor_categories`
 4. Endpoint `visitors` di-generate ulang dan endpoint `/datatables` mengembalikan kolom `category_code` dan `category_name`
 
@@ -118,7 +118,7 @@ Perbandingan:
 | FK constraint hasil | `fk_visitors_category ... REFERENCES visitor_categories (category_id)` | Sama persis |
 | Auto-index | `idx_visitors_category_id` | Sama |
 | Penyebutan target table | Langsung di shorthand | Diturunkan dari **nama key relation**; bila key (mis. `category`) ≠ nama tabel, wajib set `target` eksplisit |
-| `onDelete` / `onUpdate` | Tidak didukung | Didukung (`cascade`, `restrict`, `setNull`, `noAction`) |
+| `onDelete` / `onUpdate` | Default `RESTRICT` (tidak dapat dikustomisasi) | Didukung custom (`cascade`, `restrict`, `setNull`, `noAction`) |
 | Relasi `hasOne` / `hasMany` | Tidak didukung | Didukung |
 | Keringkasan | Lebih ringkas | Lebih verbose |
 
@@ -126,7 +126,7 @@ Aturan penting:
 
 - Internal-nya, inline `fk:` di-auto-promote menjadi entry `relations` — keduanya setara secara fungsional.
 - Satu field tidak boleh memakai kedua cara sekaligus (validator menolak dengan error eksplisit).
-- Pemilihan bentuk tidak mempengaruhi keterbatasan `schema apply` pada Langkah 3: FK constraint tetap `deferred` di jalur incremental, terlepas dari cara deklarasi.
+- Pada jalur incremental `schema apply` (Langkah 3), FK constraint fisik tetap dibuat (ADD CONSTRAINT) terlepas dari cara deklarasi inline atau `relations`.
 
 Pilih `relations` apabila diperlukan behavior `onDelete`/`onUpdate`, nama relation custom, atau relasi inverse `hasOne`/`hasMany`. Untuk FK sederhana, inline `fk:` sudah memadai.
 
@@ -142,18 +142,34 @@ Tidak menampilkan error. Bila `schema\visitor-categories.js` tidak ada di folder
 
 ### Langkah 3: Apply Perubahan ke Database
 
-Tabel `visitors` sudah ada di database, sehingga perubahan diterapkan secara incremental via `schema apply` (ADD COLUMN), bukan `schema migrate` yang memakai `CREATE TABLE IF NOT EXISTS`.
+Tabel `visitors` sudah ada di database, sehingga perubahan diterapkan secara incremental via `schema apply` (ADD COLUMN + CREATE INDEX + ADD CONSTRAINT FK), bukan `schema migrate` yang memakai `CREATE TABLE IF NOT EXISTS`.
 
 Dry-run lalu apply:
 
 ```bat
-npx restforge schema apply --path=schema\visitors.js --config=db-connection.env --table=visitors --dry-run
-npx restforge schema apply --path=schema\visitors.js --config=db-connection.env --table=visitors
+npx restforge schema apply --path=schema\visitors.js --table=visitors --dry-run
+npx restforge schema apply --path=schema\visitors.js --table=visitors
 ```
 
-Dry-run menampilkan preview `ALTER TABLE visitors ADD COLUMN category_id ...`. Apply mengeksekusi penambahan kolom; data `visitors` existing tetap utuh.
+Dry-run menampilkan preview tiga operasi additive:
 
-> **Catatan penting (terverifikasi dari handbook):** `schema apply` bersifat additive konservatif. Penambahan **kolom** `category_id` didukung, namun **penambahan FK constraint fisik termasuk operasi `deferred`** dan di-skip oleh `schema apply` (lihat `apply.md` section "Operasi yang Belum Didukung"). Konsekuensi: relasi terbentuk pada level kolom dan didukung penuh oleh JOIN di RDF (Langkah 5), tanpa FK constraint fisik di database. Apabila FK constraint fisik mutlak diperlukan, satu-satunya jalur saat ini adalah `schema migrate --path=schema\visitors.js --drop=true` yang bersifat **destruktif** (seluruh data `visitors` hilang) dan berada di luar scope skenario ini.
+```
+[visitors]
+ALTER TABLE visitors ADD COLUMN category_id VARCHAR(36);
+CREATE INDEX idx_visitors_category_id ON visitors (category_id);
+ALTER TABLE visitors ADD CONSTRAINT fk_visitors_category FOREIGN KEY (category_id) REFERENCES visitor_categories (category_id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+Summary:
+  Tables affected:    1
+  Additions:          3
+  Modifications:      0
+  Deletions:          0
+  Skipped (opt-in):   0
+```
+
+Apply mengeksekusi ketiga operasi tersebut; data `visitors` existing tetap utuh.
+
+> **Catatan (terverifikasi dari output dry-run):** `schema apply` bersifat additive dan non-destruktif. Pada jalur incremental ini, `schema apply` menambahkan tiga operasi sekaligus: kolom `category_id`, index `idx_visitors_category_id`, dan FK constraint fisik `fk_visitors_category` (REFERENCES `visitor_categories(category_id)`, default `ON DELETE RESTRICT ON UPDATE RESTRICT`). Summary menampilkan `Additions: 3` dan `Skipped: 0`. Penambahan FK constraint aman karena seluruh record `visitors` existing memiliki `category_id` bernilai `NULL` sehingga tidak melanggar constraint. Relasi terbentuk penuh di level database tanpa perlu `schema migrate --drop=true` yang destruktif.
 
 Verifikasi kolom ter-tambah:
 
@@ -292,7 +308,7 @@ Status `[OK]`. Validasi SQL keyword dijalankan saat `endpoint create` (Langkah 6
 Endpoint `visitors` sudah ada dari Skenario 6, sehingga flag `--force` diperlukan untuk menimpa file existing:
 
 ```bat
-npx restforge endpoint create --project=myapp --name=visitors --payload=visitors.json --force
+npx restforge endpoint create --project=visitors-app --name=visitors --payload=visitors.json --force
 ```
 
 Generator membaca isi `visitors-join.sql` dan menyisipkannya sebagai SQL literal di module hasil generate. Validasi schema payload-vs-database lolos karena `category_id` sudah ada di tabel.
@@ -301,16 +317,16 @@ Generator membaca isi `visitors-join.sql` dan menyisipkannya sebagai SQL literal
 
 ### Langkah 7: Verifikasi JOIN via curl
 
-Jalankan server pada cmd terpisah:
+Endpoint `visitors` baru saja di-generate ulang pada Langkah 6 (dengan `--force`), sehingga backend server perlu di-refresh agar perubahan JOIN ter-load. Backend server kemungkinan masih berjalan dari skenario sebelumnya. Hentikan dulu server tersebut dengan `Ctrl + C` pada cmd yang menjalankannya, lalu jalankan ulang:
 
 ```bat
-npx restforge serve --project=myapp --config=db-connection.env
+npx restforge serve --project=visitors-app --config=db-connection.env
 ```
 
 Pada cmd lain, uji `/datatables`:
 
 ```bat
-cd playbook\sandbox\backend\examples\myapp\visitors\curl
+cd playbook\sandbox\backend\examples\visitors-app\visitors\curl
 demo-datatables.bat
 ```
 
@@ -318,7 +334,7 @@ Setiap record pada array `data` kini memuat field `category_id`, `category_code`
 
 Untuk menguji record dengan kategori terisi: ambil `category_id` valid dari endpoint `visitor_categories` (`demo-create.bat` Skenario 10), buat/update record `visitors` dengan `category_id` tersebut, lalu jalankan ulang `demo-datatables.bat` dan pastikan `category_name` terisi.
 
-Stop server via `Ctrl + C` setelah selesai.
+Server dapat dibiarkan tetap berjalan untuk dilanjutkan ke Skenario 12; hentikan hanya bila ingin mengakhiri sesi.
 
 ---
 

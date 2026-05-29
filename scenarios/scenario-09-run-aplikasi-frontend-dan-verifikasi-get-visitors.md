@@ -8,7 +8,7 @@
 
 1. Backend server RESTForge running di port `3000` dari workspace `sandbox\backend`
 2. Aplikasi frontend running di port `8000` dari workspace `sandbox\frontend\apps\visitors-app`
-3. Halaman `visitors.html` di browser memuat list visitors melalui call ke endpoint backend `http://127.0.0.1:3000/api/myapp/visitors`
+3. Halaman `visitors.html` di browser memuat list visitors melalui call ke endpoint backend `http://127.0.0.1:3000/api/visitors-app/visitors`
 
 ---
 
@@ -17,23 +17,31 @@
 | Item | Cara Verifikasi |
 |------|-----------------|
 | Skenario 8 selesai | Folder `sandbox\frontend\apps\visitors-app\` berisi `index.html`, `visitors.html`, `app-start.bat`, folder `js\`, `css\` |
-| Port `3000` dan `8000` tersedia | `netstat -ano \| findstr :3000` dan `netstat -ano \| findstr :8000` tidak menampilkan entri `LISTENING` |
+| Backend server running | `serve --project=visitors-app` dari Skenario 6 Langkah 4 masih aktif; `netstat -ano \| findstr :3000` menampilkan entri `LISTENING` |
+| Port `8000` tersedia | `netstat -ano \| findstr :8000` tidak menampilkan entri `LISTENING` |
 | Browser tersedia | Chrome, Edge, Firefox, atau browser modern lainnya |
 
 ---
 
 ## Langkah Eksekusi (Execution Steps)
 
-### Langkah 1: Start Backend Server
+### Langkah 1: Pastikan Backend Server Running
 
-Pada jendela cmd pertama, pindah ke workspace backend lalu jalankan runtime server:
+Skenario ini berfokus pada aplikasi frontend. Backend server merupakan prasyarat yang sudah dijalankan pada Skenario 6 (`serve --project=visitors-app`), bukan dijalankan ulang di sini. Langkah ini hanya memastikan server tersebut masih aktif di port `3000`.
+
+Pada jendela cmd, verifikasi port `3000` sudah berstatus `LISTENING`:
 
 ```bat
-cd playbook\sandbox\backend
-npx restforge serve --project=myapp --config=db-connection.env
+netstat -ano | findstr :3000
 ```
 
-Server harus start tanpa error fatal dan menampilkan log `[OK] Server ready on port 3000`. Biarkan jendela cmd ini tetap terbuka selama Skenario 9 berjalan.
+Output harus menampilkan entri `LISTENING` pada `127.0.0.1:3000`. Sebagai konfirmasi tambahan, endpoint health dapat diakses melalui browser:
+
+```
+http://127.0.0.1:3000/api/visitors-app/health
+```
+
+Bila port `3000` belum `LISTENING`, jalankan backend server terlebih dahulu mengikuti Skenario 6 Langkah 4, lalu biarkan jendela cmd tersebut tetap terbuka selama Skenario 9 berjalan.
 
 ---
 
@@ -76,7 +84,7 @@ Verifikasi kondisi berikut pada halaman `Visitors`:
 | Aspek | Kondisi |
 |-------|---------|
 | Tabel data | Ter-render dengan kolom `Name`, `Email`, `Phone` (sesuai UDF `visitors.json`) |
-| Pemanggilan API | Tab Network di DevTools (F12) menampilkan request ke `http://127.0.0.1:3000/api/myapp/visitors` dengan response status `200` |
+| Pemanggilan API | Tab Network di DevTools (F12) menampilkan request ke `http://127.0.0.1:3000/api/visitors-app/visitors` dengan response status `200` |
 | Data ter-load | Jika data visitors sudah ada (mis. hasil Create dari Skenario 7), list muncul di tabel. Jika belum ada data, tabel menampilkan pesan empty state tanpa error |
 | Console browser | Tab Console di DevTools tidak menampilkan error fatal (mis. `Failed to fetch`, `CORS error`) |
 
@@ -88,10 +96,10 @@ Skenario pengujian yang disarankan:
 
 | Action | Langkah Pengujian | Verifikasi Hasil |
 |--------|-------------------|------------------|
-| Create | Klik tombol **Add** atau **Create** pada halaman `Visitors`. Isi form dengan data baru (`Name`, `Email`, `Phone`) lalu submit | Record baru muncul di tabel tanpa reload manual; tab Network menampilkan request `POST /api/myapp/visitors/create` dengan response `success: true` |
-| Read (detail) | Klik salah satu baris record (atau tombol **View**/**Detail**) untuk melihat detail | Form detail menampilkan nilai `Name`, `Email`, `Phone` sesuai record; tab Network menampilkan request `POST /api/myapp/visitors/first` atau `/read` dengan response `200` |
-| Update | Klik tombol **Edit** pada baris record yang sudah ada. Ubah salah satu field (mis. `Name` atau `Phone`) lalu submit | Nilai record di tabel ter-update tanpa reload; tab Network menampilkan request `POST /api/myapp/visitors/update` dengan response `success: true` |
-| Delete | Klik tombol **Delete** pada baris record. Konfirmasi dialog hapus apabila tersedia | Record hilang dari tabel; tab Network menampilkan request `POST /api/myapp/visitors/delete` dengan response `deleted_count: 1` |
+| Create | Klik tombol **Add** atau **Create** pada halaman `Visitors`. Isi form dengan data baru (`Name`, `Email`, `Phone`) lalu submit | Record baru muncul di tabel tanpa reload manual; tab Network menampilkan request `POST /api/visitors-app/visitors/create` dengan response `success: true` |
+| Read (detail) | Klik salah satu baris record (atau tombol **View**/**Detail**) untuk melihat detail | Form detail menampilkan nilai `Name`, `Email`, `Phone` sesuai record; tab Network menampilkan request `POST /api/visitors-app/visitors/first` atau `/read` dengan response `200` |
+| Update | Klik tombol **Edit** pada baris record yang sudah ada. Ubah salah satu field (mis. `Name` atau `Phone`) lalu submit | Nilai record di tabel ter-update tanpa reload; tab Network menampilkan request `POST /api/visitors-app/visitors/update` dengan response `success: true` |
+| Delete | Klik tombol **Delete** pada baris record. Konfirmasi dialog hapus apabila tersedia | Record hilang dari tabel; tab Network menampilkan request `POST /api/visitors-app/visitors/delete` dengan response `deleted_count: 1` |
 
 Verifikasi tambahan selama pengujian CRUD:
 
@@ -105,28 +113,9 @@ Catatan: layout dan label tombol CRUD pada aplikasi hasil generate mengikuti tem
 
 ---
 
-### Langkah 4: Stop Aplikasi dan Backend Server
+### Langkah 4 (Opsional): Stop atau Lanjutkan
 
-Stop aplikasi frontend pada cmd kedua via:
-
-```
-Ctrl + C
-```
-
-Stop backend server pada cmd pertama via:
-
-```
-Ctrl + C
-```
-
-Verifikasi kedua port kembali tersedia:
-
-```bat
-netstat -ano | findstr :3000
-netstat -ano | findstr :8000
-```
-
-Kedua command harus mengembalikan output kosong.
+Stop tidak wajib pada tahap ini. Backend server dan aplikasi frontend dapat dibiarkan tetap berjalan untuk dilanjutkan ke Skenario 10 dan seterusnya. Hentikan kedua process hanya bila ingin mengakhiri sesi, dengan menekan `Ctrl + C` pada masing-masing cmd (frontend pada cmd kedua, backend pada cmd pertama).
 
 ---
 
@@ -134,18 +123,17 @@ Kedua command harus mengembalikan output kosong.
 
 | Item | Kondisi |
 |------|---------|
-| Backend server | Start dari `sandbox\backend` tanpa error, listening pada port `3000` |
+| Backend server | Sudah running sejak Skenario 6, terverifikasi port `3000` berstatus `LISTENING` |
 | Aplikasi frontend | Start dari `sandbox\frontend\apps\visitors-app` via `app-start.bat`, listening pada port `8000` |
 | Homepage | `http://localhost:8000/index.html` dapat dibuka di browser |
 | Halaman visitors | `http://localhost:8000/visitors.html` menampilkan tabel dengan kolom `Name`, `Email`, `Phone` |
-| Integrasi API | Request ke `http://127.0.0.1:3000/api/myapp/visitors` mengembalikan status `200` di tab Network DevTools |
-| Stop | Kedua process berhasil di-stop, port `3000` dan `8000` kembali tersedia |
+| Integrasi API | Request ke `http://127.0.0.1:3000/api/visitors-app/visitors` mengembalikan status `200` di tab Network DevTools |
 
 ---
 
 ## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
 
-Skenario 9 menutup track onboarding RESTForge end-to-end (backend + frontend). Pengembangan lanjutan seperti pengujian operasi CRUD lengkap dari aplikasi frontend (Create, Update, Delete), validasi field, dan handling response error dari backend dapat dieksplorasi dengan mereferensikan handbook RESTForge sesuai topik (master-detail, processor, dashboard, dll.).
+Skenario 9 menyelesaikan track onboarding inti (backend + frontend single-page). Rangkaian berlanjut ke Skenario 10 (tabel `visitor_categories` dari SDF hingga endpoint), Skenario 11 (revisi `visitors` dengan JOIN ke `visitor_categories`), dan Skenario 12 (frontend multi-page). Backend server dapat dibiarkan tetap berjalan untuk melanjutkan ke skenario tersebut.
 
 ---
 

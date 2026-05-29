@@ -17,7 +17,7 @@
 
 | Item | Cara Verifikasi |
 |------|-----------------|
-| Skenario 1-6 selesai | Backend `myapp` sudah ter-generate, tabel `visitors` aktif di database |
+| Skenario 1-6 selesai | Backend `visitors-app` sudah ter-generate, tabel `visitors` aktif di database |
 | Working directory aktif di `sandbox\backend` | Jalankan `cd`, path berakhiran `\playbook\sandbox\backend` |
 | Default config sudah di-set | `npx restforge config get-default` menampilkan `config\db-connection.env` |
 
@@ -160,7 +160,7 @@ Bagian `[ ... ]` dan `{ ... }` mewakili isi existing yang tidak diubah; hanya bl
 ### Langkah 7: Generate Endpoint REST
 
 ```bat
-npx restforge endpoint create --project=myapp --name=visitor-categories --payload=visitor-categories.json
+npx restforge endpoint create --project=visitors-app --name=visitor-categories --payload=visitor-categories.json
 ```
 
 Validasi schema payload-vs-database lolos (RDF baru saja di-generate dari tabel yang sama). Endpoint ter-generate beserta example files curl/Postman/Insomnia.
@@ -169,25 +169,25 @@ Validasi schema payload-vs-database lolos (RDF baru saja di-generate dari tabel 
 
 ### Langkah 8: Test Endpoint via curl
 
-Jalankan server pada cmd terpisah:
+Endpoint `visitor-categories` baru saja ter-generate, sehingga backend server perlu di-refresh agar endpoint tersebut ter-load. Backend server kemungkinan masih berjalan dari skenario sebelumnya (hanya memuat 1 endpoint `visitors`). Hentikan dulu server tersebut dengan `Ctrl + C` pada cmd yang menjalankannya, lalu jalankan ulang:
 
 ```bat
-npx restforge serve --project=myapp --config=db-connection.env
+npx restforge serve --project=visitors-app --config=db-connection.env
 ```
 
-Log harus menampilkan `Loading 2 endpoint(s)` (`visitors` + `visitor_categories`) dan `[OK] Server ready on port 3000`.
+Log harus menampilkan `Loading 2 endpoint(s)` (`visitors` + `visitor_categories`) dan `[OK] Server ready on port 3000`. Jumlah `2 endpoint(s)` inilah yang mengonfirmasi refresh berhasil memuat endpoint baru.
 
 Pada cmd lain, eksekusi demo create lalu datatables:
 
 ```bat
-cd playbook\sandbox\backend\examples\myapp\visitor-categories\curl
+cd playbook\sandbox\backend\examples\visitors-app\visitor-categories\curl
 demo-create.bat
 demo-datatables.bat
 ```
 
 `demo-create.bat` mengembalikan `success: true` dengan `category_id` UUID v7. `demo-datatables.bat` menampilkan record tersebut pada array `data`.
 
-Stop server via `Ctrl + C` setelah selesai.
+Server dapat dibiarkan tetap berjalan untuk dilanjutkan ke Skenario 11; hentikan hanya bila ingin mengakhiri sesi.
 
 ---
 
@@ -199,7 +199,7 @@ Stop server via `Ctrl + C` setelah selesai.
 | `schema migrate` | Sukses, tabel `visitor_categories` ter-create |
 | `schema diff` | Exit code `0` |
 | `payload\visitor-categories.json` | Ter-generate, `payload validate` status `[OK]` |
-| `endpoint create` | Sukses exit code `0`, folder `examples\myapp\visitor-categories\` terbentuk |
+| `endpoint create` | Sukses exit code `0`, folder `examples\visitors-app\visitor-categories\` terbentuk |
 | Server | `Loading 2 endpoint(s)`, `demo-create.bat` + `demo-datatables.bat` sukses |
 
 ---

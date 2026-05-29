@@ -43,7 +43,7 @@ Pindah working directory ke `sandbox\backend`, lalu jalankan command migrate:
 
 ```bat
 cd playbook\sandbox\backend
-npx restforge payload migrate --name=visitors.json --project=myapp --output=../frontend/payload --config=db-connection.env
+npx restforge payload migrate --name=visitors.json --project=visitors-app --output=../frontend/payload --config=db-connection.env
 ```
 
 Output yang diharapkan menampilkan ringkasan migrasi:
@@ -55,8 +55,8 @@ PAYLOAD MIGRATE - RDF (backend) -> UDF (frontend)
 
   Input        : ...\sandbox\backend\payload\visitors.json
   Output       : ...\sandbox\frontend\payload\visitors.json
-  Project      : myapp
-  apiBaseUrl   : http://127.0.0.1:3000/api/myapp
+  Project      : visitors-app
+  apiBaseUrl   : http://127.0.0.1:3000/api/visitors-app
   Port         : 3000
   Pages        : 1
 

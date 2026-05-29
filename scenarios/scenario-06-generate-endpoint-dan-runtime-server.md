@@ -9,9 +9,9 @@
 Setelah menyelesaikan skenario ini, kondisi berikut harus tercapai:
 
 1. Endpoint REST `visitors` sudah ter-generate hasil dari `endpoint create` berbasis `payload\visitors.json`
-2. Folder `src\models\myapp\`, file `metadata\myapp.json`, dan folder `examples\myapp\visitors\` sudah terbentuk di `sandbox\backend`
+2. Folder `src\models\visitors-app\`, file `metadata\visitors-app.json`, dan folder `examples\visitors-app\visitors\` sudah terbentuk di `sandbox\backend`
 3. Runtime HTTP server berjalan pada port `3000` (default) dan menampilkan log siap menerima request
-4. Endpoint `visitors` dapat di-test via demo curl pada folder `examples\myapp\visitors\curl\` dan mengembalikan response sesuai action (create, datatables, read, first, lookup, update, delete)
+4. Endpoint `visitors` dapat di-test via demo curl pada folder `examples\visitors-app\visitors\curl\` dan mengembalikan response sesuai action (create, datatables, read, first, lookup, update, delete)
 
 Catatan: skenario ini mencakup testing via demo `.bat` script (curl). Testing via UI/GUI tool (Postman, Insomnia, atau browser) akan dibahas pada Skenario 7.
 
@@ -77,14 +77,14 @@ Tiga flag wajib (selain `--config` yang sudah di-handle default):
 
 | Flag | Nilai pada skenario ini | Keterangan |
 |------|------------------------|-----------|
-| `--project` | `myapp` | Nama project target |
+| `--project` | `visitors-app` | Nama project target |
 | `--name` | `visitors` | Nama endpoint yang akan dibuat |
 | `--payload` | `visitors.json` | Nama file RDF di folder `payload/` |
 
 Jalankan generate:
 
 ```bat
-npx restforge endpoint create --project=myapp --name=visitors --payload=visitors.json
+npx restforge endpoint create --project=visitors-app --name=visitors --payload=visitors.json
 ```
 
 Output sukses akan menampilkan ringkasan file yang ter-generate beserta example files (curl, Postman, Insomnia) karena flag default `--create-examples=true`.
@@ -112,19 +112,19 @@ Exit code yang mungkin:
 
 ### Langkah 3: Inspeksi Struktur Folder Hasil Generate
 
-Setelah generate sukses, project `myapp` tersebar pada beberapa folder di dalam `sandbox\backend` sesuai konvensi RESTForge. Verifikasi visual disarankan menggunakan IDE seperti VS Code atau Cursor untuk membuka folder `sandbox\backend` dan menelusuri tree struktur folder secara langsung.
+Setelah generate sukses, project `visitors-app` tersebar pada beberapa folder di dalam `sandbox\backend` sesuai konvensi RESTForge. Verifikasi visual disarankan menggunakan IDE seperti VS Code atau Cursor untuk membuka folder `sandbox\backend` dan menelusuri tree struktur folder secara langsung.
 
 Struktur folder yang harus terbentuk setelah `endpoint create`:
 
 | Path | Isi |
 |------|-----|
-| `src\models\myapp\` | Kode endpoint dan query SQL hasil generate untuk project `myapp` |
-| `metadata\myapp.json` | File konfigurasi project `myapp` |
-| `metadata\myapp-workbench.json` | File workbench config project `myapp` |
+| `src\models\visitors-app\` | Kode endpoint dan query SQL hasil generate untuk project `visitors-app` |
+| `metadata\visitors-app.json` | File konfigurasi project `visitors-app` |
+| `metadata\visitors-app-workbench.json` | File workbench config project `visitors-app` |
 | `metadata\global.json` | File konfigurasi global (di-share lintas project) |
-| `examples\myapp\visitors\` | Example files untuk endpoint `visitors` (sub-folder `curl\`, `insomnia\`, `postman\`) |
+| `examples\visitors-app\visitors\` | Example files untuk endpoint `visitors` (sub-folder `curl\`, `insomnia\`, `postman\`) |
 
-Sub-folder `examples\myapp\visitors\curl\` berisi 7 demo `.bat` script siap pakai per action endpoint (create, datatables, delete, first, lookup, read, update) plus `run-all-demos.bat`. File-file ini akan dipakai pada Skenario 7 untuk testing actual request.
+Sub-folder `examples\visitors-app\visitors\curl\` berisi 7 demo `.bat` script siap pakai per action endpoint (create, datatables, delete, first, lookup, read, update) plus `run-all-demos.bat`. File-file ini akan dipakai pada Skenario 7 untuk testing actual request.
 
 Catatan: pada tahap onboarding ini tidak perlu modifikasi pada folder hasil generate. Customisasi akan dibahas pada skenario pengembangan setelah onboarding selesai.
 
@@ -134,10 +134,10 @@ Catatan: pada tahap onboarding ini tidak perlu modifikasi pada folder hasil gene
 
 Perintah `serve` menjalankan runtime HTTP server untuk project yang sudah ter-generate. Default port `3000` dan default bind address `127.0.0.1`.
 
-Jalankan server untuk project `myapp`:
+Jalankan server untuk project `visitors-app`:
 
 ```bat
-npx restforge serve --project=myapp --config=db-connection.env
+npx restforge serve --project=visitors-app --config=db-connection.env
 ```
 
 Server akan start dan menampilkan log informasi runtime. Proses ini bersifat **foreground**, artinya cmd akan tetap berjalan menampilkan log dan tidak kembali ke prompt sampai server di-stop.
@@ -151,7 +151,7 @@ Output sukses terdiri dari dua bagian: **banner ringkasan konfigurasi** dan **lo
 ║               RESTFORGE RUNTIME SERVER                ║
 ╠═══════════════════════════════════════════════════════╣
 ║  Environment : Node.js                                ║
-║  Project     : myapp                                  ║
+║  Project     : visitors-app                           ║
 ║  Port        : 3000                                   ║
 ║  Config      : db-connection.env                      ║
 ║  API Key     : NOT ACTIVE                             ║
@@ -159,13 +159,13 @@ Output sukses terdiri dari dua bagian: **banner ringkasan konfigurasi** dan **lo
 
 INFO [16:59:36]: Configuration loaded: db-connection.env
 INFO [16:59:36]: 
-INFO [16:59:36]: [OK] Project loaded: myapp
-INFO [16:59:36]: Starting myapp project...
-INFO [16:59:36]: Starting Myapp module
+INFO [16:59:36]: [OK] Project loaded: visitors-app
+INFO [16:59:36]: Starting visitors-app project...
+INFO [16:59:36]: Starting VisitorsApp module
 INFO [16:59:36]: Loading 1 endpoint(s)
 INFO [16:59:36]: [OK] Server ready on port 3000
-INFO [16:59:36]:   Health: http://127.0.0.1:3000/api/myapp/health
-INFO [16:59:36]:   Info:   http://127.0.0.1:3000/api/myapp/info
+INFO [16:59:36]:   Health: http://127.0.0.1:3000/api/visitors-app/health
+INFO [16:59:36]:   Info:   http://127.0.0.1:3000/api/visitors-app/info
 INFO [16:59:36]:   URL:    http://127.0.0.1:3000
 ```
 
@@ -175,7 +175,7 @@ Penjelasan per bagian output:
 |--------|-----------|
 | Banner box | Ringkasan konfigurasi runtime aktif: nama project, port, file config, dan status API Key |
 | `Configuration loaded` | Konfirmasi file config (`db-connection.env`) berhasil dibaca |
-| `[OK] Project loaded: myapp` | Project `myapp` berhasil di-load dari folder `src\models\myapp\` |
+| `[OK] Project loaded: visitors-app` | Project `visitors-app` berhasil di-load dari folder `src\models\visitors-app\` |
 | `Loading 1 endpoint(s)` | Jumlah endpoint yang ter-detect pada project. Pada skenario ini bernilai `1` (endpoint `visitors`) |
 | `[OK] Server ready on port 3000` | Konfirmasi server sudah listening pada port yang dikonfigurasi |
 | `Health`, `Info`, `URL` | URL utility built-in untuk monitoring server. Detail penggunaan dibahas pada Skenario 7 |
@@ -202,7 +202,9 @@ Output menampilkan entri `LISTENING` pada `127.0.0.1:3000` apabila server aktif.
 
 #### Cara Stop Server
 
-Server perlu tetap berjalan untuk mendukung Langkah 6 (Test Endpoint REST via curl). Setelah seluruh testing pada Langkah 6 selesai, hentikan server pada cmd yang menjalankan `serve` dengan kombinasi tombol:
+Server perlu tetap berjalan untuk mendukung Langkah 6 (Test Endpoint REST via curl), dan dibiarkan tetap aktif untuk dilanjutkan ke Skenario 7 (test via Postman) hingga Skenario 9 (integrasi frontend). Skenario-skenario tersebut hanya memverifikasi server sudah running, bukan menjalankannya ulang, sehingga server cukup dijalankan sekali di sini.
+
+Server dihentikan hanya bila ingin mengakhiri sesi onboarding. Untuk menghentikannya, gunakan kombinasi tombol berikut pada cmd yang menjalankan `serve`:
 
 ```
 Ctrl + C
@@ -216,19 +218,19 @@ Catatan: jangan menutup jendela cmd secara paksa (mis. close window) saat server
 
 ### Langkah 6: Test Endpoint REST via curl
 
-Server `myapp` (Langkah 4) sudah listening pada port `3000` dan endpoint `visitors` siap menerima request. Folder `examples\myapp\visitors\curl\` berisi 7 demo `.bat` script siap pakai per action endpoint plus `run-all-demos.bat` sebagai orkestrator.
+Server `visitors-app` (Langkah 4) sudah listening pada port `3000` dan endpoint `visitors` siap menerima request. Folder `examples\visitors-app\visitors\curl\` berisi 7 demo `.bat` script siap pakai per action endpoint plus `run-all-demos.bat` sebagai orkestrator.
 
 #### Daftar Demo Script
 
 | Script | Action | Endpoint Path |
 |--------|--------|---------------|
-| `demo-create.bat` | create | `POST /api/myapp/visitors/create` |
-| `demo-datatables.bat` | datatables | `POST /api/myapp/visitors/datatables` |
-| `demo-read.bat` | read | `POST /api/myapp/visitors/read` |
-| `demo-first.bat` | first | `POST /api/myapp/visitors/first` |
-| `demo-lookup.bat` | lookup | `POST /api/myapp/visitors/lookup` |
-| `demo-update.bat` | update | `POST /api/myapp/visitors/update` |
-| `demo-delete.bat` | delete | `POST /api/myapp/visitors/delete` |
+| `demo-create.bat` | create | `POST /api/visitors-app/visitors/create` |
+| `demo-datatables.bat` | datatables | `POST /api/visitors-app/visitors/datatables` |
+| `demo-read.bat` | read | `POST /api/visitors-app/visitors/read` |
+| `demo-first.bat` | first | `POST /api/visitors-app/visitors/first` |
+| `demo-lookup.bat` | lookup | `POST /api/visitors-app/visitors/lookup` |
+| `demo-update.bat` | update | `POST /api/visitors-app/visitors/update` |
+| `demo-delete.bat` | delete | `POST /api/visitors-app/visitors/delete` |
 
 Setiap script membaca file payload JSON dari sub-folder `payload\` dan mengeksekusi `curl -X POST` dengan payload tersebut ke endpoint yang sesuai.
 
@@ -237,7 +239,7 @@ Setiap script membaca file payload JSON dari sub-folder `payload\` dan mengeksek
 Buka **jendela cmd baru** (jangan tutup cmd yang menjalankan server) dan pindah ke folder demo:
 
 ```bat
-cd playbook\sandbox\backend\examples\myapp\visitors\curl
+cd playbook\sandbox\backend\examples\visitors-app\visitors\curl
 ```
 
 #### Eksekusi Demo Tunggal: create
@@ -322,20 +324,20 @@ Skenario 6 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
 | Item | Kondisi |
 |------|---------|
 | Perintah `endpoint create` | Sukses dengan exit code `0`, tanpa schema drift |
-| Folder `src\models\myapp\` | Sudah terbentuk berisi kode endpoint hasil generate |
-| File `metadata\myapp.json` | Sudah terbentuk sebagai konfigurasi project |
-| Folder `examples\myapp\visitors\` | Sudah terbentuk berisi demo files (curl, postman, insomnia) |
-| Perintah `serve --project=myapp` | Berhasil menjalankan server tanpa error fatal |
+| Folder `src\models\visitors-app\` | Sudah terbentuk berisi kode endpoint hasil generate |
+| File `metadata\visitors-app.json` | Sudah terbentuk sebagai konfigurasi project |
+| Folder `examples\visitors-app\visitors\` | Sudah terbentuk berisi demo files (curl, postman, insomnia) |
+| Perintah `serve --project=visitors-app` | Berhasil menjalankan server tanpa error fatal |
 | Port `3000` | Berstatus `LISTENING` pada output `netstat` selama server berjalan |
 | Demo `demo-create.bat` | Berhasil dieksekusi dan mengembalikan response `success: true` dengan `visitor_id` UUID v7 |
 | Demo `demo-datatables.bat` | Berhasil dieksekusi dan menampilkan record hasil `create` pada array `data` |
-| Stop server | Server berhasil di-stop via `Ctrl+C` dan port `3000` kembali tersedia |
+| Server tetap berjalan | Port `3000` berstatus `LISTENING` dan dibiarkan aktif untuk dilanjutkan ke Skenario 7 (stop hanya bila mengakhiri sesi) |
 
 ---
 
 ## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
 
-Skenario 7 akan membahas testing endpoint REST via UI/GUI tool (Postman, Insomnia) menggunakan example collection yang ter-generate pada folder `examples\myapp\visitors\postman\` dan `examples\myapp\visitors\insomnia\`. Detail lengkap tersedia pada dokumen Skenario 7.
+Skenario 7 akan membahas testing endpoint REST via UI/GUI tool (Postman, Insomnia) menggunakan example collection yang ter-generate pada folder `examples\visitors-app\visitors\postman\` dan `examples\visitors-app\visitors\insomnia\`. Detail lengkap tersedia pada dokumen Skenario 7.
 
 ---
 

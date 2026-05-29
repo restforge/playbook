@@ -8,7 +8,7 @@
 
 Setelah menyelesaikan skenario ini, kondisi berikut harus tercapai:
 
-1. Collection Postman `Myapp - Visitors` ter-import ke workspace Postman
+1. Collection Postman `Visitors-app - Visitors` ter-import ke workspace Postman
 2. Variable `{{baseUrl}}` ter-set ke `http://localhost:3000`
 3. Tujuh action endpoint (`create`, `datatables`, `read`, `first`, `lookup`, `update`, `delete`) berhasil dieksekusi dan mengembalikan response sesuai ekspektasi
 
@@ -18,7 +18,7 @@ Setelah menyelesaikan skenario ini, kondisi berikut harus tercapai:
 
 | Topik | Sumber |
 |-------|--------|
-| Postman collection auto-generated | `examples\myapp\visitors\postman\visitors.json` |
+| Postman collection auto-generated | `examples\visitors-app\visitors\postman\visitors.json` |
 | Behavior endpoint `first` dan `read` (resolusi sumber data) | [docs/features/feat-first.md](../../docs/features/feat-first.md), [docs/features/feat-read.md](../../docs/features/feat-read.md) |
 | Postman documentation (import, environment, send request) | https://learning.postman.com/docs/ |
 
@@ -28,9 +28,9 @@ Setelah menyelesaikan skenario ini, kondisi berikut harus tercapai:
 
 | Item | Cara Verifikasi |
 |------|-----------------|
-| Skenario 6 sudah selesai | Folder `examples\myapp\visitors\postman\` berisi `visitors.json` |
+| Skenario 6 sudah selesai | Folder `examples\visitors-app\visitors\postman\` berisi `visitors.json` |
 | Postman terinstall di workstation | Aplikasi Postman dapat dibuka (versi free sudah cukup) |
-| Server `myapp` running | Eksekusi `serve --project=myapp` pada Skenario 6 Langkah 4 masih aktif dan port `3000` berstatus `LISTENING` |
+| Server `visitors-app` running | Eksekusi `serve --project=visitors-app` pada Skenario 6 Langkah 4 masih aktif dan port `3000` berstatus `LISTENING` |
 
 ---
 
@@ -41,12 +41,12 @@ Setelah menyelesaikan skenario ini, kondisi berikut harus tercapai:
 Buka aplikasi Postman, lalu import collection auto-generated:
 
 1. Klik tombol **Import** pada sidebar workspace
-2. Drag file `playbook\sandbox\backend\examples\myapp\visitors\postman\visitors.json` ke area drop, atau klik **Choose Files** dan pilih file tersebut
-3. Konfirmasi import. Collection `Myapp - Visitors` akan muncul di sidebar dengan 7 request
+2. Drag file `playbook\sandbox\backend\examples\visitors-app\visitors\postman\visitors.json` ke area drop, atau klik **Choose Files** dan pilih file tersebut
+3. Konfirmasi import. Collection `Visitors-app - Visitors` akan muncul di sidebar dengan 7 request
 
 Setup variable `{{baseUrl}}` pada level collection:
 
-1. Klik kanan collection `Myapp - Visitors`, pilih **Edit**
+1. Klik kanan collection `Visitors-app - Visitors`, pilih **Edit**
 2. Buka tab **Variables**
 3. Tambah variable dengan nilai berikut:
 
@@ -69,7 +69,7 @@ Pilih request `visitors/create` pada collection. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/create` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/create` |
 | Headers | `Content-Type: application/json` (auto-set) |
 
 Body (raw JSON):
@@ -115,7 +115,7 @@ Pilih request `visitors/datatables`. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/datatables` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/datatables` |
 | Headers | `Content-Type: application/json` (auto-set) |
 
 Body (sudah ter-set oleh collection, biarkan apa adanya):
@@ -146,7 +146,7 @@ Pilih request `visitors/read`. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/read` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/read` |
 | Headers | `Content-Type: application/json` (auto-set) |
 
 Body:
@@ -175,7 +175,7 @@ Pilih request `visitors/first`. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/first` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/first` |
 | Headers | `Content-Type: application/json` (auto-set) |
 
 Body (**edit**: ganti placeholder `"Demo visitor_id"` dengan UUID hasil Langkah 2):
@@ -204,7 +204,7 @@ Pilih request `visitors/lookup`. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/lookup` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/lookup` |
 | Headers | `Content-Type: application/json` + **`X-Request-Mode: static`** |
 
 **PENTING**: header `X-Request-Mode: static` **wajib** untuk action `lookup` dengan method POST. Tanpa header ini, runtime mengembalikan HTTP 400 dengan pesan `"X-Request-Mode header must be set to static for POST method"`. Collection auto-generated sudah memasukkan header ini, namun perlu diverifikasi pada tab **Headers**.
@@ -242,7 +242,7 @@ Pilih request `visitors/update`. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/update` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/update` |
 | Headers | `Content-Type: application/json` (auto-set) |
 
 Body (**edit**: ganti `"Demo visitor_id"` dengan UUID hasil Langkah 2):
@@ -271,7 +271,7 @@ Pilih request `visitors/delete`. Detail konfigurasi:
 | Properti | Nilai |
 |----------|-------|
 | Method | `POST` |
-| URL | `{{baseUrl}}/api/myapp/visitors/delete` |
+| URL | `{{baseUrl}}/api/visitors-app/visitors/delete` |
 | Headers | `Content-Type: application/json` (auto-set) |
 
 Body (**edit**: ganti `"Demo visitor_id"` dengan UUID hasil Langkah 2):
@@ -328,7 +328,7 @@ Skenario 7 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
 
 Skenario 7 menutup track backend onboarding RESTForge. Pada titik ini, kondisi yang tercapai:
 
-- Project `myapp` ter-generate dari SDF dan RDF di workspace `sandbox\backend`
+- Project `visitors-app` ter-generate dari SDF dan RDF di workspace `sandbox\backend`
 - Endpoint REST `visitors` berjalan pada runtime server
 - Seluruh action endpoint tervalidasi via curl (Skenario 6) dan Postman (Skenario 7)
 

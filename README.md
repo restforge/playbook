@@ -43,7 +43,7 @@ Seluruh file skenario tersedia di folder [scenarios/](scenarios/).
 ## Struktur Folder (Folder Structure)
 
 ```
-restforge-playbook/
+playbook/
 ├── scenarios/          Dokumentasi skenario onboarding (Skenario 1-13)
 ├── sandbox/            Workspace eksekusi untuk artefak hasil playbook
 │   ├── backend/        Working directory untuk Skenario 1-7, 10-11 (akan dibuat saat eksekusi)
@@ -70,10 +70,10 @@ Folder `sandbox/` sengaja di-ignore dari git agar setiap developer dapat mengeks
 ## Cara Memulai (Getting Started)
 
 1. Clone repository ini ke local machine
-2. Buka folder `restforge-playbook/` melalui terminal
+2. Pada terminal, tetap berada di folder root project tempat clone dijalankan (mis. `D:\belajar`); repo hasil clone berada di sub-folder `playbook/`
 3. Mulai dari [scenarios/scenario-01-persiapan-dan-instalasi.md](scenarios/scenario-01-persiapan-dan-instalasi.md)
 4. Ikuti instruksi setiap skenario secara berurutan
-5. Seluruh artefak hasil eksekusi akan tersimpan di folder `sandbox/`
+5. Seluruh artefak hasil eksekusi akan tersimpan di folder `playbook/sandbox/`
 
 ---
 
@@ -82,8 +82,8 @@ Folder `sandbox/` sengaja di-ignore dari git agar setiap developer dapat mengeks
 - Seluruh perintah CLI mengikuti pattern `npx restforge <resource> <verb> [--flag=value]`
 - Reference resmi tersedia di [RESTForge Handbook](https://github.com/restforge/handbook)
 - Definition file menggunakan format JSON dengan validasi schema bawaan
-- Working directory aktif untuk eksekusi backend adalah `sandbox/backend/`
-- Working directory aktif untuk eksekusi frontend adalah `sandbox/frontend/`
+- Working directory aktif untuk eksekusi backend adalah `playbook/sandbox/backend/` (relatif terhadap folder root project)
+- Working directory aktif untuk eksekusi frontend adalah `playbook/sandbox/frontend/` (relatif terhadap folder root project)
 
 ---
 

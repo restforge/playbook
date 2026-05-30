@@ -39,10 +39,9 @@ Catatan instalasi RESTForge Designer: installer resmi tersedia pada [https://res
 
 ### Langkah 1: Migrasi RDF ke UDF dari Workspace Backend
 
-Pindah working directory ke `sandbox\backend`, lalu jalankan command migrate:
+Pastikan working directory berada di `sandbox\backend`, lalu jalankan command migrate:
 
 ```bat
-cd playbook\sandbox\backend
 npx restforge payload migrate --name=visitors.json --project=visitors-app --output=../frontend/payload --config=db-connection.env
 ```
 
@@ -77,13 +76,7 @@ Catatan: bila file output sudah ada dari eksekusi sebelumnya, tambahkan flag `--
 
 ### Langkah 2: Aktivasi License RESTForge Designer
 
-Pindah working directory ke workspace frontend:
-
-```bat
-cd ..\frontend
-```
-
-Jalankan command activate dengan license key yang tersedia (ganti `XXXX-XXXX-XXXX-XXXX` dengan license key aktual):
+Pindah working directory ke workspace frontend (`sandbox\frontend`, satu level di atas `backend`), lalu jalankan command activate dengan license key yang tersedia (ganti `XXXX-XXXX-XXXX-XXXX` dengan license key aktual):
 
 ```bat
 restforge-designer activate --key=XXXX-XXXX-XXXX-XXXX
@@ -155,23 +148,6 @@ Output harus menampilkan file shared (mis. `index.html`, `app-start.bat`, folder
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-| Item | Kondisi |
-|------|---------|
-| File UDF | `sandbox\frontend\payload\visitors.json` ter-create dari hasil migrate |
-| License Designer | `restforge-designer license status` menampilkan `Validation: valid` |
-| Folder aplikasi | `sandbox\frontend\apps\visitors-app\` berisi `index.html`, `app-start.bat`, folder `js\`, `css\`, dan asset plugin |
-| File per-page | `visitors.html` dan `js\visitors.js` ter-generate di folder aplikasi |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 9 akan membahas cara menjalankan aplikasi frontend hasil generate (`app-start.bat`), test integrasi dengan backend server (CRUD `visitors` end-to-end dari browser ke database), dan editing manual UDF untuk kustomisasi tampilan (mis. `fieldRows`, label, icon).
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal, nomor langkah saat error terjadi, output `dir` pada folder yang relevan (`sandbox\backend\payload`, `sandbox\frontend\payload`, atau `sandbox\frontend\apps`), serta output `restforge-designer license status` apabila terkait verifikasi license.
+Lanjut ke Skenario 9: run aplikasi frontend dan verifikasi GET visitors.

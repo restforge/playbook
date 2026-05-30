@@ -308,36 +308,6 @@ Verifikasi via re-eksekusi request `datatables` (Langkah 3). Nilai `recordsTotal
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 7 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Action | Status Diharapkan |
-|--------|-------------------|
-| `create` | HTTP 201, response `success: true` dengan `visitor_id` UUID v7 |
-| `datatables` | HTTP 200, `recordsTotal >= 1` |
-| `read` | HTTP 200, response berisi `data` array dan `pagination` |
-| `first` | HTTP 200, response berisi 1 record dengan `visitor_id` sesuai |
-| `lookup` | HTTP 200, response berformat `{id, text}` (header `X-Request-Mode: static` ter-set) |
-| `update` | HTTP 200, response memuat data yang ter-update |
-| `delete` | HTTP 200, `deleted_count: 1` |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 7 menutup track backend onboarding RESTForge. Pada titik ini, kondisi yang tercapai:
-
-- Project `visitors-app` ter-generate dari SDF dan RDF di workspace `sandbox\backend`
-- Endpoint REST `visitors` berjalan pada runtime server
-- Seluruh action endpoint tervalidasi via curl (Skenario 6) dan Postman (Skenario 7)
-
-Skenario 8 akan melanjutkan ke track frontend: migrasi payload RDF backend (`sandbox\backend\payload\visitors.json`) menjadi UDF frontend (`sandbox\frontend\payload\visitors.json`), aktivasi license RESTForge Designer, dan generate aplikasi frontend ke `sandbox\frontend\apps\visitors-app\`.
-
-Untuk pengembangan lanjutan di luar track onboarding, referensi tersedia pada handbook RESTForge sesuai topik (master-detail, processor, kafka, dashboard, dll.).
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta detail request (method, URL, headers, body) dan response (status code, body) pada langkah yang gagal. Sertakan screenshot tab Postman bila terkait konfigurasi request.
+Lanjut ke Skenario 8: migrasi RDF ke UDF dan generate aplikasi frontend.

@@ -242,28 +242,7 @@ Output harus mencantumkan `db-connection.env` sebagai salah satu entri.
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 2 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Item | Kondisi |
-|------|---------|
-| File `config\db-connection.env` | Sudah terbentuk dan terisi `LICENSE` valid serta credential PostgreSQL pada section Database |
-| Section non-konfigurasi awal | Section Live Sync, Redis, Kafka, Cache, Job, Lock, IDGen tetap pada nilai default (`*_ENABLED=false`) |
-| Database PostgreSQL pada `DB_NAME` | Sudah ada pada server (dibuat manual atau via prompt auto-create RESTForge) |
-| Perintah `restforge validate` | Pada eksekusi final (setelah database ada), mengembalikan `[OK] Connection successful` untuk Database Connection dan tanpa error license |
-| Default config | `db-connection.env` tampil pada output `config get-default` |
-| Daftar file `.env` | `db-connection.env` tampil pada output `config list` |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 3 akan membahas pembuatan SDF (Schema Definition File) dari katalog template RESTForge, plus validasi dan preview DDL. Detail lengkap tersedia pada dokumen Skenario 3.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal dan nomor langkah saat error terjadi. Sertakan isi `config\db-connection.env` dengan password disensor bila terkait koneksi database.
+Lanjut ke Skenario 3: pembuatan dan validasi SDF.
 

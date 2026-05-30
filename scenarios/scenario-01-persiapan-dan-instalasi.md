@@ -118,27 +118,7 @@ Output harus menampilkan daftar resource dan verb yang tersedia (runtime, schema
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 1 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Item | Kondisi |
-|------|---------|
-| Folder `<root-project>\playbook\sandbox\backend` | Sudah terbentuk dan menjadi working directory aktif |
-| Folder `<root-project>\playbook\sandbox\frontend` | Sudah terbentuk dalam keadaan kosong (akan digunakan pada Skenario 8) |
-| Folder `node_modules\@restforgejs\platform` | Sudah terbentuk di dalam folder `sandbox\backend` |
-| Perintah `npx restforge --version` | Mengembalikan nomor versi tanpa error |
-| Perintah `npx restforge --help` | Menampilkan daftar resource dan verb |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 2 akan membahas inisialisasi project via `restforge init`, konfigurasi `config\db-connection.env`, dan validasi koneksi database. Detail lengkap tersedia pada dokumen Skenario 2.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal dan nomor langkah saat error terjadi.
+Lanjut ke Skenario 2: inisialisasi project dan konfigurasi database.
 

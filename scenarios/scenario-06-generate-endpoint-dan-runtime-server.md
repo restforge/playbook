@@ -317,30 +317,6 @@ Catatan: tanpa edit payload terlebih dahulu, demo `update`, `delete`, dan `first
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 6 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Item | Kondisi |
-|------|---------|
-| Perintah `endpoint create` | Sukses dengan exit code `0`, tanpa schema drift |
-| Folder `src\models\visitors-app\` | Sudah terbentuk berisi kode endpoint hasil generate |
-| File `metadata\visitors-app.json` | Sudah terbentuk sebagai konfigurasi project |
-| Folder `examples\visitors-app\visitors\` | Sudah terbentuk berisi demo files (curl, postman, insomnia) |
-| Perintah `serve --project=visitors-app` | Berhasil menjalankan server tanpa error fatal |
-| Port `3000` | Berstatus `LISTENING` pada output `netstat` selama server berjalan |
-| Demo `demo-create.bat` | Berhasil dieksekusi dan mengembalikan response `success: true` dengan `visitor_id` UUID v7 |
-| Demo `demo-datatables.bat` | Berhasil dieksekusi dan menampilkan record hasil `create` pada array `data` |
-| Server tetap berjalan | Port `3000` berstatus `LISTENING` dan dibiarkan aktif untuk dilanjutkan ke Skenario 7 (stop hanya bila mengakhiri sesi) |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 7 akan membahas testing endpoint REST via UI/GUI tool (Postman, Insomnia) menggunakan example collection yang ter-generate pada folder `examples\visitors-app\visitors\postman\` dan `examples\visitors-app\visitors\insomnia\`. Detail lengkap tersedia pada dokumen Skenario 7.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal dan nomor langkah saat error terjadi. Sertakan output `endpoint create` bila terkait validasi schema, atau log runtime server bila terkait startup error.
+Lanjut ke Skenario 7: test endpoint via Postman.

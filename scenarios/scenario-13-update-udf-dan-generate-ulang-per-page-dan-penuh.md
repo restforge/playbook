@@ -140,31 +140,6 @@ Setelah dihapus, generator membuat ulang `index.html` dengan daftar card yang se
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-| Item | Kondisi |
-|------|---------|
-| Pemahaman mode | Mampu memilih `--scope=form` (per-page) vs `--scope=app` (penuh) sesuai jenis perubahan |
-| Validasi | `restforge-designer validate --payload=payload/visitors-app.json` menampilkan `Payload is valid` |
-| Generate per-page | `--scope=form --page=visitor-categories` hanya menulis ulang file halaman tersebut (plus shared); halaman lain dan `index.html` tidak berubah |
-| Generate penuh | `--scope=app` menulis ulang seluruh page dan shared |
-| Penanganan `index.html` | Saat set page berubah, `index.html` lama dihapus sebelum generate penuh sehingga daftar card ter-update |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 13 melengkapi alur onboarding dengan teknik update dan generate ulang. Backend server tetap mengikuti model keep-alive Skenario 6 (cukup dipastikan running, lihat Skenario 12 Langkah 6), karena perubahan pada layer frontend tidak menyentuh endpoint backend.
-
-Pengembangan lanjutan seperti master-detail, dashboard widget, processor, dan kustomisasi `fieldRows`/`fieldLayout` dapat dieksplorasi dengan mereferensikan handbook RESTForge sesuai topik.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan:
-
-- Nomor langkah saat error terjadi
-- Output lengkap perintah `restforge-designer generate` atau `validate` yang gagal
-- Output `dir apps\visitors-app` (untuk memverifikasi file mana yang ter-update)
-- Bila terkait `index.html`, sertakan timestamp file (`dir apps\visitors-app\index.html`) untuk memastikan apakah file ter-regenerasi atau masih versi lama
+Eksplorasi pengembangan lanjutan (master-detail, dashboard, processor, kustomisasi layout) via handbook RESTForge sesuai topik.

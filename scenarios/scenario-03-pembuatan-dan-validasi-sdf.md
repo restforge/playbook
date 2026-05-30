@@ -276,28 +276,7 @@ Catatan dari handbook `catalogs/sdf/README.md`: tipe shorthand bersifat logical 
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 3 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Item | Kondisi |
-|------|---------|
-| Folder `schema\` | Sudah terbentuk di working directory `sandbox\backend` |
-| File `schema\visitors.js` | Sudah ter-generate dari `schema template --domain=generic --table=visitors` dengan isi sesuai preview `--show` |
-| Perintah `schema validate` | Tidak menampilkan error |
-| Perintah `schema models` | Menampilkan satu model `visitors` dengan structural summary (8 fields, PK `visitor_id`, unique `email`, index `name`) |
-
-Langkah 9 (Preview DDL) bersifat opsional dan tidak menjadi bagian dari Kriteria Selesai.
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 4 akan membahas apply SDF ke database via `schema migrate`, verifikasi tabel ter-create, dan drift detection antara SDF dan database. Detail lengkap tersedia pada dokumen Skenario 4.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal dan nomor langkah saat error terjadi. Sertakan isi `schema\visitors.js` bila terkait validasi SDF.
+Lanjut ke Skenario 4: apply SDF ke database.
 

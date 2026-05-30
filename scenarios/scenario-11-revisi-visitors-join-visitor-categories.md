@@ -338,26 +338,6 @@ Server dapat dibiarkan tetap berjalan untuk dilanjutkan ke Skenario 12; hentikan
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-| Item | Kondisi |
-|------|---------|
-| `schema\visitors.js` | Field `category_id` dengan `fk:visitor_categories.category_id`, lolos `schema validate` |
-| `schema apply` | Kolom `category_id` ter-tambah, data existing aman |
-| `schema describe --table=visitors` | Menampilkan kolom `category_id` |
-| `payload\visitors.json` | `fieldName` memuat `category_code` & `category_name`; ada `datatablesQuery`, `viewQuery`, `datatablesWhere`; `payload validate` `[OK]` |
-| `payload\query\visitors-join.sql` | Berisi SQL JOIN yang men-SELECT `category_code` dan `category_name` dari `visitor_categories` |
-| `endpoint create --force` | Sukses exit code `0` |
-| `demo-datatables.bat` | Response memuat `category_code` dan `category_name` |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Endpoint `visitors` kini menyajikan data kategori. Untuk menampilkannya di aplikasi frontend (Skenario 8-9), jalankan ulang `npx restforge payload migrate` untuk `visitors.json` lalu `restforge-designer generate --overwrite` agar UDF dan aplikasi ter-update dengan kolom kategori dan dropdown lookup `visitor_categories`.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan output lengkap perintah yang gagal beserta nomor langkah. Untuk error JOIN, sertakan isi `payload\query\visitors-join.sql` dan `payload\visitors.json`. Untuk error apply, sertakan output `schema apply --dry-run` dan `schema describe --table=visitors`.
+Lanjut ke Skenario 12: frontend multi-page visitor_categories dan visitors.

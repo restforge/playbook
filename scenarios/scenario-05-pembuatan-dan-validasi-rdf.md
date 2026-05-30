@@ -229,27 +229,7 @@ Pada skenario onboarding ini, tabel `visitors` memiliki 4 kolom audit lengkap se
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 5 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Item | Kondisi |
-|------|---------|
-| File `payload\visitors.json` | Sudah ter-generate dari `payload generate --table=visitors` |
-| Isi file RDF | Mengandung `tableName: "visitors"`, `primaryKey: "visitor_id"`, dan `fieldName` array berisi kolom non-audit |
-| Perintah `payload validate --table=visitors` | Menampilkan status `[OK]` dan exit code `0` |
-
-Langkah 5 (Drift Detection Detail) dan Langkah 6 (Sinkronisasi) bersifat opsional dan tidak menjadi bagian dari Kriteria Selesai.
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 6 akan membahas generate endpoint REST dari RDF via `endpoint create` dan menjalankan runtime server. Detail lengkap tersedia pada dokumen Skenario 6.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal dan nomor langkah saat error terjadi. Sertakan isi `payload\visitors.json` bila terkait validasi RDF.
+Lanjut ke Skenario 6: generate endpoint dan runtime server.
 

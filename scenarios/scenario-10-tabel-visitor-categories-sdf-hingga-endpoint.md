@@ -191,25 +191,6 @@ Server dapat dibiarkan tetap berjalan untuk dilanjutkan ke Skenario 11; hentikan
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-| Item | Kondisi |
-|------|---------|
-| `schema\visitor-categories.js` | Didefinisikan, lolos `schema validate` |
-| `schema migrate` | Sukses, tabel `visitor_categories` ter-create |
-| `schema diff` | Exit code `0` |
-| `payload\visitor-categories.json` | Ter-generate, `payload validate` status `[OK]` |
-| `endpoint create` | Sukses exit code `0`, folder `examples\visitors-app\visitor-categories\` terbentuk |
-| Server | `Loading 2 endpoint(s)`, `demo-create.bat` + `demo-datatables.bat` sukses |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 11 merevisi SDF `visitors` agar memiliki foreign key ke `visitor_categories`, menerapkan perubahan via `schema apply` (additive), lalu meng-generate ulang RDF `visitors.json` dengan tampilan JOIN.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan output lengkap perintah yang gagal beserta nomor langkah. Sertakan isi `schema\visitor-categories.js` bila terkait validasi SDF, atau `payload\visitor-categories.json` bila terkait validasi RDF.
+Lanjut ke Skenario 11: revisi visitors dengan JOIN ke visitor_categories.

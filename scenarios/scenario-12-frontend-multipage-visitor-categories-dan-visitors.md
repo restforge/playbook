@@ -46,8 +46,8 @@
 Dari `sandbox\backend`, migrate kategori lebih dulu, lalu visitors. Flag `--overwrite` diperlukan karena `visitors.json` sudah ada dari Skenario 8:
 
 ```bat
-npx restforge payload migrate --name=visitor-categories.json --project=visitors-app --output=..\frontend\payload --config=db-connection.env --overwrite
-npx restforge payload migrate --name=visitors.json --project=visitors-app --output=..\frontend\payload --config=db-connection.env --overwrite
+npx restforge payload migrate --project=visitors-app --name=visitor-categories.json --output=..\frontend\payload --config=db-connection.env --overwrite
+npx restforge payload migrate --project=visitors-app --name=visitors.json --output=..\frontend\payload --config=db-connection.env --overwrite
 ```
 
 Setiap perintah menghasilkan UDF single-page (`Pages: 1`). Output `visitors` kini menyertakan `category_id`; kolom display JOIN (`category_code`, `category_name`) di-exclude dari form sesuai aturan migrasi.
@@ -56,19 +56,18 @@ Setiap perintah menghasilkan UDF single-page (`Pages: 1`). Output `visitors` kin
 
 ### Langkah 2: Susun Struktur Multi-Page
 
-Pindah ke folder payload frontend dan buat folder `pages`:
+Pindah ke folder payload frontend (`sandbox\frontend\payload`), lalu buat folder `pages`:
 
 ```bat
-cd ..\frontend\payload
 mkdir pages
 ```
 
-Setiap hasil migrate berbentuk `{ "appConfig": { ... }, "pages": [ ... ] }`. Susun struktur multi-page dengan **membelah** tiap hasil migrate menjadi dua bagian, bukan menyusun ulang dari nol:
+Setiap hasil migrate berbentuk `{ "appConfig": { ... }, "pages": [ ... ] }`. Susun struktur multi-page dengan memisahkan tiap hasil migrate:
 
-- blok `appConfig` → `app-config.json` (cukup satu file, dipakai bersama semua page)
-- blok `pages` → `pages\<tabel>.json` (satu file per tabel)
+- blok `appConfig` (sama untuk semua page) diekstrak **sekali** ke `app-config.json`
+- tiap file hasil migrate **dipindahkan ke folder `pages\`**, lalu blok `appConfig`-nya dihapus (sisakan blok `pages`)
 
-Karena `pages` pada hasil migrate sudah berupa array, file di `pages\` otomatis berbentuk `{ "pages": [ ... ] }` yang valid untuk `include` tanpa perlu dibungkus ulang. Loader `include` membaca array `pages` dari file yang direferensikan; file tanpa array `pages` ditolak dengan error `does not contain a valid 'pages' array`.
+Nama file hasil migrate sudah sama dengan nama fragmen target (mis. `visitor-categories.json` menjadi `pages\visitor-categories.json`), sehingga langkahnya benar-benar memindahkan file ke subfolder `pages\` dan membuang `appConfig`. Karena `pages` pada hasil migrate sudah berupa array, file di `pages\` otomatis berbentuk `{ "pages": [ ... ] }` yang valid untuk `include` tanpa perlu dibungkus ulang. Loader `include` membaca array `pages` dari file yang direferensikan; file tanpa array `pages` ditolak dengan error `does not contain a valid 'pages' array`.
 
 **a. Buat `app-config.json`** — salin salah satu hasil migrate, lalu hapus blok `pages` (sisakan `appConfig`):
 
@@ -171,10 +170,9 @@ Buat `visitors-app.json` di `sandbox\frontend\payload` sebagai UDF gabungan. Fil
 }
 ```
 
-Validasi sebelum generate:
+Pindah kembali ke `sandbox\frontend` (naik satu level dari folder `payload`), lalu validasi sebelum generate:
 
 ```bat
-cd ..
 restforge-designer validate --payload=payload/visitors-app.json
 ```
 
@@ -242,32 +240,25 @@ Catatan urutan: dropdown kategori kosong apabila belum ada record `visitor_categ
 
 ---
 
-### Langkah 7: Stop
+### Langkah 7: Data Contoh Visitor Categories
 
-Stop frontend (cmd kedua) dan backend (cmd pertama) via `Ctrl + C`.
+Sebagai bahan pengisian saat Create kategori pada Langkah 6, berikut contoh data `visitor_categories` yang dapat dimasukkan melalui form **Visitor Categories**. Kolom `Status` dibiarkan default (Active):
 
----
-
-## Kriteria Selesai (Completion Criteria)
-
-| Item | Kondisi |
-|------|---------|
-| UDF source | `sandbox\frontend\payload` berisi `app-config.json`, `visitors-app.json`, `pages\visitor-categories.json`, `pages\visitors.json` |
-| Validasi | `restforge-designer validate --payload=payload/visitors-app.json` lolos tanpa error |
-| Field dropdown | `category_id` pada `pages\visitors.json` bertipe `select` dengan `dataSource` API `resource: visitor-categories` |
-| Aplikasi | `sandbox\frontend\apps\visitors-app` berisi `index.html`, `visitor-categories.html`, `visitors.html`, `app-start.bat` |
-| Sidebar | Menampilkan link **Visitor Categories** dan **Visitors** |
-| Dropdown runtime | Halaman Visitors memuat opsi kategori via `POST /api/visitors-app/visitor-categories/lookup` (`200`) |
-| End-to-end | Visitor dengan kategori tersimpan; tabel Visitors menampilkan `category_name` |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Aplikasi multi-page kini menggabungkan master (`visitor_categories`) dan transaksi (`visitors`) dalam satu frontend. Pengembangan lanjutan dapat mengeksplorasi `dataFilters` (filter kategori di toolbar Visitors), `fieldRows` (grid layout form), atau penambahan resource lain ke array `pages` dengan pola `include` yang sama.
+| Category Code | Category Name | Description | Default Duration Hours | Requires Escort |
+|---------------|---------------|-------------|------------------------|-----------------|
+| GUEST | Tamu Umum | Tamu biasa seperti klien atau mitra bisnis | 8 | Yes |
+| VIP | VIP | Tamu penting seperti direksi atau pejabat | 8 | No |
+| VENDOR | Vendor/Supplier | Pihak ketiga penyedia barang atau jasa | 8 | Yes |
+| CONTRACTOR | Kontraktor | Pekerja eksternal jangka pendek/proyek | 12 | No |
+| INTERVIEWEE | Kandidat | Pelamar kerja yang datang wawancara | 4 | Yes |
+| INTERN | Magang | Mahasiswa atau anak magang | 10 | No |
+| COURIER | Kurir | Pengantar paket atau dokumen | 1 | Yes |
+| MAINTENANCE | Maintenance | Teknisi servis seperti AC, lift, kebersihan | 8 | Yes |
+| AUDITOR | Auditor | Auditor eksternal atau inspektor | 8 | No |
+| FAMILY | Keluarga Karyawan | Keluarga atau kerabat karyawan | 4 | Yes |
 
 ---
 
-## Pelaporan Issue (Issue Reporting)
+## Langkah Berikutnya (Next Step)
 
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan output lengkap perintah yang gagal beserta nomor langkah. Untuk error validasi/generate, sertakan output `restforge-designer validate` dan isi `visitors-app.json`. Untuk dropdown kosong di browser, sertakan screenshot tab Network (request `/visitor-categories/lookup`) dan tab Console DevTools.
+Lanjut ke Skenario 13: update UDF dan generate ulang per-page dan penuh.

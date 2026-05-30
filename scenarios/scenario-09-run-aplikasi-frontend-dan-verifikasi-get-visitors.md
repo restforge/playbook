@@ -119,38 +119,6 @@ Stop tidak wajib pada tahap ini. Backend server dan aplikasi frontend dapat dibi
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-| Item | Kondisi |
-|------|---------|
-| Backend server | Sudah running sejak Skenario 6, terverifikasi port `3000` berstatus `LISTENING` |
-| Aplikasi frontend | Start dari `sandbox\frontend\apps\visitors-app` via `app-start.bat`, listening pada port `8000` |
-| Homepage | `http://localhost:8000/index.html` dapat dibuka di browser |
-| Halaman visitors | `http://localhost:8000/visitors.html` menampilkan tabel dengan kolom `Name`, `Email`, `Phone` |
-| Integrasi API | Request ke `http://127.0.0.1:3000/api/visitors-app/visitors` mengembalikan status `200` di tab Network DevTools |
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 9 menyelesaikan track onboarding inti (backend + frontend single-page). Rangkaian berlanjut ke Skenario 10 (tabel `visitor_categories` dari SDF hingga endpoint), Skenario 11 (revisi `visitors` dengan JOIN ke `visitor_categories`), dan Skenario 12 (frontend multi-page). Backend server dapat dibiarkan tetap berjalan untuk melanjutkan ke skenario tersebut.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta:
-
-- Nomor langkah saat error terjadi
-- Output lengkap perintah yang gagal pada cmd backend atau cmd frontend
-- Screenshot tab Console dan tab Network browser DevTools (jika error terjadi di halaman browser)
-- Output `netstat -ano | findstr :3000` dan `netstat -ano | findstr :8000`
-
-Issue umum yang patut diperiksa:
-
-| Gejala | Area Verifikasi |
-|--------|----------------|
-| Tabel kosong tanpa error | Apakah ada data visitors di database? Verifikasi via curl pada Skenario 7 |
-| `Failed to fetch` di Console | Apakah backend server running? Apakah `apiBaseUrl` di UDF sesuai dengan host:port backend? |
-| `CORS error` di Console | Apakah backend mengizinkan request dari `http://localhost:8000`? Verifikasi konfigurasi CORS di backend |
-| Port `8000` sudah terpakai | Stop process lain yang memakai port tersebut, atau ubah `appConfig.port` di UDF lalu regenerate |
+Lanjut ke Skenario 10: tabel visitor_categories dari SDF hingga endpoint.

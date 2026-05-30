@@ -208,28 +208,7 @@ npx restforge schema diff --path=schema\visitors.js --json
 
 ---
 
-## Kriteria Selesai (Completion Criteria)
+## Langkah Berikutnya (Next Step)
 
-Skenario 4 dianggap selesai apabila seluruh kondisi berikut terpenuhi:
-
-| Item | Kondisi |
-|------|---------|
-| Perintah `schema migrate` | Sukses tanpa error, status setiap statement `✓` |
-| Perintah `schema list` | Mencantumkan tabel `visitors` pada output |
-| Perintah `schema describe --table=visitors` | Menampilkan struktur tabel dengan 8 kolom, PK `visitor_id`, unique `email`, index `name` |
-| Perintah `schema diff` | Mengembalikan exit code `0` (tidak ada drift) |
-
-Langkah 2 (Dry-Run Migrate) bersifat opsional dan tidak menjadi bagian dari Kriteria Selesai.
-
----
-
-## Catatan untuk Tahap Berikutnya (Notes for Next Stage)
-
-Skenario 5 akan membahas generate RDF (Resource Definition File) dari schema database dan validasi RDF terhadap struktur tabel. Detail lengkap tersedia pada dokumen Skenario 5.
-
----
-
-## Pelaporan Issue (Issue Reporting)
-
-Apabila ditemukan kondisi tidak sesuai ekspektasi, hentikan eksekusi dan dokumentasikan permasalahan beserta output lengkap perintah yang gagal dan nomor langkah saat error terjadi. Sertakan output `restforge validate` bila terkait koneksi database.
+Lanjut ke Skenario 5: generate dan validasi RDF.
 

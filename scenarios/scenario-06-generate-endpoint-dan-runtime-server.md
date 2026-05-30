@@ -285,9 +285,9 @@ Action `update`, `delete`, dan `first` memerlukan `visitor_id` valid pada payloa
 Sebelum mengeksekusi demo action tersebut, edit file payload dengan UUID actual hasil `demo-create.bat`:
 
 ```bat
-notepad payload\update.json
-notepad payload\delete.json
-notepad payload\first.json
+code payload\update.json
+code payload\delete.json
+code payload\first.json
 ```
 
 Ganti nilai placeholder `"Demo visitor_id"` dengan UUID v7 actual, simpan file, lalu jalankan demo:

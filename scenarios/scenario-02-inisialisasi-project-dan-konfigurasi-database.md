@@ -88,10 +88,10 @@ File `payload\samples.json` dan `payload\query\samples-datatables.sql` yang juga
 
 ### Langkah 3: Edit Credential PostgreSQL dan License
 
-Buka file `config\db-connection.env` menggunakan notepad atau VS Code:
+Buka file `config\db-connection.env` menggunakan VS Code:
 
 ```bat
-notepad config\db-connection.env
+code config\db-connection.env
 ```
 
 Template ter-generate berisi banyak section (License, Server, Live Sync, Redis, Export, Kafka, Database, Logging, SQL Logging, Cache, Job Scheduler, Distributed Lock, ID Generator). Pada onboarding awal, fokus penyesuaian hanya pada **dua section**: License dan Database. 

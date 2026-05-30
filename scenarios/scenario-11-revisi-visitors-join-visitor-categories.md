@@ -55,7 +55,7 @@ Path harus berakhiran `\playbook\sandbox\backend` dan default config menampilkan
 Buka `schema\visitors.js`:
 
 ```bat
-notepad schema\visitors.js
+code schema\visitors.js
 ```
 
 Tambahkan field `category_id` dengan FK shorthand ke `visitor_categories`:
@@ -223,7 +223,7 @@ Buat file `payload\query\visitors-join.sql`:
 
 ```bat
 mkdir payload\query
-notepad payload\query\visitors-join.sql
+code payload\query\visitors-join.sql
 ```
 
 Isi:
@@ -243,7 +243,7 @@ LEFT JOIN visitor_categories vc ON vc.category_id = v.category_id
 Buka `payload\visitors.json`:
 
 ```bat
-notepad payload\visitors.json
+code payload\visitors.json
 ```
 
 Lakukan dua penyesuaian **pada object `payload\visitors.json` yang sudah ada** (bukan file atau object baru).

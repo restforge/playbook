@@ -112,7 +112,7 @@ Detail anatomi lengkap seluruh field RDF (termasuk `fieldValidation`, `defaultSc
 Buka file hasil generate untuk inspeksi visual:
 
 ```bat
-notepad payload\visitors.json
+code payload\visitors.json
 ```
 
 Isi file harus mencakup struktur dasar berikut:

@@ -65,7 +65,7 @@ Aturan penting yang berlaku pada kedua mode:
 Sebagai contoh perubahan dalam-page, edit `pages\visitor-categories.json` dan ubah `pageSubtitle`:
 
 ```bat
-notepad payload\pages\visitor-categories.json
+code payload\pages\visitor-categories.json
 ```
 
 Ubah nilai `pageSubtitle`, misalnya dari `"Manage visitor categories data"` menjadi `"Kelola data kategori pengunjung"`. Perubahan ini bersifat dalam-page (tidak mengubah `navigation` maupun set halaman), sehingga cocok untuk generate per-page.

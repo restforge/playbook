@@ -186,7 +186,7 @@ Apabila tujuan hanya scaffold cepat dengan template `dummy` (master-data generic
 Buka file hasil generate untuk inspeksi visual:
 
 ```bat
-notepad schema\visitors.js
+code schema\visitors.js
 ```
 
 Pastikan isi file sesuai dengan struktur SDF berikut:

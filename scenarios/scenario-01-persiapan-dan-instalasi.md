@@ -36,6 +36,7 @@ Pemeriksaan berikut perlu dilakukan sebelum melanjutkan ke langkah eksekusi:
 | Node.js dan npm terpasang | Jalankan `node --version` dan `npm --version` pada cmd |
 | Akses internet ke registry npm | Konfirmasi koneksi internet tersedia untuk download package dari registry |
 | Folder root project dapat diakses dan writable | Folder `<root-project>` dapat diakses dan memiliki permission tulis |
+| IDE / editor teks terpasang | Skenario ini menggunakan VS Code. Jalankan `code --version` pada cmd untuk memastikan VS Code terpasang dan command `code` tersedia di PATH |
 | PostgreSQL server terpasang dan dapat diakses | Jalankan `psql --version` pada cmd untuk memastikan PostgreSQL terpasang, serta tersedia host, port, user, dan password yang siap digunakan. Item ini bersifat antisipatif: tidak digunakan pada Skenario 1, namun akan dibutuhkan mulai Skenario 2 untuk validasi koneksi database |
 
 Keterangan placeholder:
@@ -45,6 +46,8 @@ Keterangan placeholder:
 Catatan: handbook tidak menetapkan versi minimum Node.js secara eksplisit. Jika ditemukan error kompatibilitas saat instalasi, hentikan eksekusi dan dokumentasikan permasalahan sebelum mencari solusi alternatif.
 
 Catatan PostgreSQL: instalasi PostgreSQL berada di luar scope playbook ini. Installer resmi tersedia pada [https://www.postgresql.org/download/](https://www.postgresql.org/download/). Penyiapan PostgreSQL sebelum Skenario 1 selesai akan mencegah interupsi onboarding saat memasuki Skenario 2.
+
+Catatan editor: seluruh skenario menggunakan VS Code via command `code <file>` untuk membuka dan mengedit file. Apabila digunakan editor lain seperti Cursor (`cursor <file>`), Notepad++, atau editor pilihan lain, sesuaikan perintah pembuka file tersebut sesuai editor yang dipakai. Langkah dan isi file yang diedit tetap sama, hanya perintah pembukanya yang berbeda.
 
 ---
 

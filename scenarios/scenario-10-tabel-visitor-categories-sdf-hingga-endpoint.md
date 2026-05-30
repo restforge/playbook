@@ -53,7 +53,7 @@ Path harus berakhiran `\playbook\sandbox\backend` dan default config menampilkan
 Buat file `schema\visitor-categories.js`:
 
 ```bat
-notepad schema\visitor-categories.js
+code schema\visitor-categories.js
 ```
 
 Isi dengan struktur berikut:

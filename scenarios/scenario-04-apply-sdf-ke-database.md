@@ -76,7 +76,7 @@ Flag `--path` menerima path file atau folder schema. Pada skenario onboarding in
 Jalankan dry-run untuk file `visitors.js`:
 
 ```bat
-npx restforge schema migrate --path=schema\visitors.js --dry-run
+npx restforge schema migrate --path=schema/visitors.js --dry-run
 ```
 
 Output mencakup:
@@ -94,7 +94,7 @@ Exit code dry-run adalah `2`. Hal ini normal dan tidak menandakan error.
 Jalankan apply per file tanpa flag `--dry-run`:
 
 ```bat
-npx restforge schema migrate --path=schema\visitors.js
+npx restforge schema migrate --path=schema/visitors.js
 ```
 
 Output sukses menampilkan:
@@ -109,7 +109,7 @@ Apabila database `DB_NAME` belum ada, migrate akan menampilkan prompt auto-creat
 
 | Pendekatan | Perintah | Use Case |
 |------------|----------|----------|
-| Per file (digunakan di skenario ini) | `--path=schema\visitors.js` | Apply satu tabel secara eksplisit. Cocok untuk onboarding bertahap dan rollout terkontrol |
+| Per file (digunakan di skenario ini) | `--path=schema/visitors.js` | Apply satu tabel secara eksplisit. Cocok untuk onboarding bertahap dan rollout terkontrol |
 | Per folder | `--path=schema` | Apply seluruh SDF di folder sekaligus. Cocok untuk bootstrap awal database atau rebuild penuh |
 
 Pada onboarding ini pendekatan per file dipilih agar setiap tabel ter-migrate secara terkontrol. Untuk skenario produksi dengan banyak file SDF, pendekatan per folder dapat dipertimbangkan setelah seluruh SDF tervalidasi.
@@ -124,7 +124,7 @@ Karakteristik mode drop:
 Mode drop dapat digunakan apabila perlu rebuild tabel dari nol (mis. setelah modifikasi SDF major yang tidak compatible dengan `ALTER TABLE`
 
 ```bat
-npx restforge schema migrate --path=schema\visitors.js --drop=true
+npx restforge schema migrate --path=schema/visitors.js --drop=true
 ```
 
 Peringatan: command akan menampilkan baris peringatan `⚠ --drop=true will DROP all tables defined in <path>. Existing data will be lost.` sebelum eksekusi. Jangan jalankan mode ini pada database production tanpa backup terverifikasi.
@@ -187,7 +187,7 @@ Perintah `schema diff` melakukan drift detection bidirectional antara SDF dan st
 Konsisten dengan pendekatan per-file pada Langkah 3, jalankan diff untuk file `visitors.js`:
 
 ```bat
-npx restforge schema diff --path=schema\visitors.js
+npx restforge schema diff --path=schema/visitors.js
 ```
 
 Setelah migrate baru saja sukses (Langkah 3), kondisi yang diharapkan adalah **tidak ada drift**. Exit code: `0`.
@@ -203,7 +203,7 @@ Exit Code:
 Output human-readable akan menampilkan ringkasan per tabel. Untuk output JSON yang dapat di-parse pada CI/CD pipeline:
 
 ```bat
-npx restforge schema diff --path=schema\visitors.js --json
+npx restforge schema diff --path=schema/visitors.js --json
 ```
 
 ---

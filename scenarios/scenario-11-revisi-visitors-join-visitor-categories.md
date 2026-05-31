@@ -147,8 +147,8 @@ Tabel `visitors` sudah ada di database, sehingga perubahan diterapkan secara inc
 Dry-run lalu apply:
 
 ```bat
-npx restforge schema apply --path=schema\visitors.js --table=visitors --dry-run
-npx restforge schema apply --path=schema\visitors.js --table=visitors
+npx restforge schema apply --path=schema/visitors.js --table=visitors --dry-run
+npx restforge schema apply --path=schema/visitors.js --table=visitors
 ```
 
 Dry-run menampilkan preview tiga operasi additive:

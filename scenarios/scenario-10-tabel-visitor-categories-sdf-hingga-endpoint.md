@@ -62,8 +62,8 @@ Isi dengan struktur berikut:
 module.exports = ({ defineModel }) => defineModel('visitor_categories', {
   fields: {
     category_id:            'string:36 pk',
-    category_code:                   'string:50 unique notnull',
-    category_name:                   'string:100 notnull',
+    category_code:          'string:50 unique notnull',
+    category_name:          'string:100 notnull',
     description:            'text',
     default_duration_hours: 'integer default:8',
     requires_escort:        'boolean default:false',
@@ -98,8 +98,8 @@ npx restforge schema models --path=schema
 Dry-run (opsional) lalu apply per file:
 
 ```bat
-npx restforge schema migrate --path=schema\visitor-categories.js --dry-run
-npx restforge schema migrate --path=schema\visitor-categories.js
+npx restforge schema migrate --path=schema/visitor-categories.js --dry-run
+npx restforge schema migrate --path=schema/visitor-categories.js
 ```
 
 Dry-run menampilkan preview `CREATE TABLE visitor_categories (...)` (exit code `2`, normal). Apply menampilkan status `✓` per statement.
@@ -111,7 +111,7 @@ Dry-run menampilkan preview `CREATE TABLE visitor_categories (...)` (exit code `
 ```bat
 npx restforge schema list
 npx restforge schema describe --table=visitor_categories
-npx restforge schema diff --path=schema\visitor-categories.js
+npx restforge schema diff --path=schema/visitor-categories.js
 ```
 
 | Perintah | Kondisi |

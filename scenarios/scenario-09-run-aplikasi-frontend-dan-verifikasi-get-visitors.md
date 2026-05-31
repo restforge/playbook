@@ -47,10 +47,9 @@ Bila port `3000` belum `LISTENING`, jalankan backend server terlebih dahulu meng
 
 ### Langkah 2: Start Aplikasi Frontend
 
-Buka **jendela cmd kedua** (jangan tutup cmd backend). Pindah ke folder aplikasi frontend lalu jalankan `app-start.bat`:
+Buka **jendela cmd kedua** (jangan tutup cmd backend). Pindah ke folder aplikasi frontend `playbook\sandbox\frontend\apps\visitors-app` lalu jalankan `app-start.bat`:
 
 ```bat
-cd playbook\sandbox\frontend\apps\visitors-app
 app-start.bat
 ```
 
@@ -83,7 +82,7 @@ Verifikasi kondisi berikut pada halaman `Visitors`:
 
 | Aspek | Kondisi |
 |-------|---------|
-| Tabel data | Ter-render dengan kolom `Name`, `Email`, `Phone` (sesuai UDF `visitors.json`) |
+| Tabel data | Ter-render dengan kolom `Name`, `Email`, `Phone` (sesuai fragmen UDF `pages\visitors.json`) |
 | Pemanggilan API | Tab Network di DevTools (F12) menampilkan request ke `http://127.0.0.1:3000/api/visitors-app/visitors` dengan response status `200` |
 | Data ter-load | Jika data visitors sudah ada (mis. hasil Create dari Skenario 7), list muncul di tabel. Jika belum ada data, tabel menampilkan pesan empty state tanpa error |
 | Console browser | Tab Console di DevTools tidak menampilkan error fatal (mis. `Failed to fetch`, `CORS error`) |
@@ -109,7 +108,7 @@ Verifikasi tambahan selama pengujian CRUD:
 - Validasi sisi backend (mis. duplicate email apabila ada unique constraint) menghasilkan response error yang ditangani oleh frontend (mis. alert/toast)
 - Setelah operasi Create dan Delete, refresh halaman untuk memastikan data persisten di database (bukan hanya state in-memory frontend)
 
-Catatan: layout dan label tombol CRUD pada aplikasi hasil generate mengikuti template default RESTForge Designer. Apabila ditemukan tombol action belum tersedia atau perlu kustomisasi tambahan (mis. konfirmasi delete, success notification), kustomisasi dilakukan via editing manual UDF (`sandbox\frontend\payload\visitors.json`) lalu regenerate aplikasi via `restforge-designer generate --overwrite`.
+Catatan: layout dan label tombol CRUD pada aplikasi hasil generate mengikuti template default RESTForge Designer. Apabila ditemukan tombol action belum tersedia atau perlu kustomisasi tambahan (mis. konfirmasi delete, success notification), kustomisasi dilakukan via editing manual fragmen page (`sandbox\frontend\payload\pages\visitors.json`) lalu regenerate aplikasi via `restforge-designer generate --payload=payload/visitors-app.json --overwrite`.
 
 ---
 

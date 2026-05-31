@@ -152,7 +152,7 @@ Flag `--generate` digunakan untuk menulis template ke filesystem. Path destinati
 Jalankan generate:
 
 ```bat
-npx restforge schema template --domain=generic --table=visitors --generate --path=schema\visitors.js
+npx restforge schema template --domain=generic --table=visitors --generate --path=schema/visitors.js
 ```
 
 Output sukses menampilkan ringkasan file yang ter-generate:
@@ -241,40 +241,6 @@ Output harus menampilkan satu model `visitors` dengan ringkasan: 8 fields, prima
 
 ---
 
-### Langkah 9 (Opsional): Preview DDL untuk PostgreSQL
-
-Langkah ini bersifat **opsional** dan **edukatif**. Validitas SDF sudah dipastikan melalui Langkah 7 (`schema validate`) dan Langkah 8 (`schema models`), sehingga preview DDL bukan prasyarat untuk Skenario 4. Apply DDL ke database akan otomatis dilakukan oleh `schema migrate` pada skenario berikutnya.
-
-Tujuan menjalankan langkah ini meliputi:
-
-- Memahami bagaimana shorthand logical type (mis. `boolean`, `timestamp`) diterjemahkan ke tipe SQL native per dialect
-- Verifikasi awal struktur DDL sebelum migrate
-- Generate file DDL terpisah (via `--out=<FILE>`) untuk review tim atau eksekusi manual
-
-Perintah `schema generate-ddl` menghasilkan DDL SQL (`CREATE TABLE`, `CREATE INDEX`, opsional `DROP`) untuk seluruh schema models. Output default ke stdout, atau ke file via `--out=<FILE>`. Perintah ini termasuk read-only dan aman dijalankan kapan saja.
-
-Preview ke stdout dengan dialect PostgreSQL:
-
-```bat
-npx restforge schema generate-ddl --path=schema --dialect=postgres
-```
-
-Output yang diharapkan mencakup:
-
-- Satu `CREATE TABLE visitors (...)` dengan kolom sesuai shorthand SDF
-- Konstrain `PRIMARY KEY` pada `visitor_id`
-- Konstrain `UNIQUE` pada `email` (sumber: shorthand `unique`)
-- Statement `CREATE INDEX` untuk `name` (constraint `unique` pada `email` sudah implisit menghasilkan index sehingga tidak dibuat dua kali, sesuai aturan deduplikasi pada `catalogs/sdf/constraints.md`)
-
-Untuk menyimpan DDL ke file (opsional):
-
-```bat
-npx restforge schema generate-ddl --path=schema --dialect=postgres --out=schema\visitors-postgres.sql
-```
-
-Catatan dari handbook `catalogs/sdf/README.md`: tipe shorthand bersifat logical bukan physical. DDL generator memetakan ke tipe SQL native sesuai dialect (mis. `boolean` di PostgreSQL menjadi `BOOLEAN`, di MySQL menjadi `VARCHAR(5)` menyimpan `'true'`/`'false'`).
-
----
 
 ## Langkah Berikutnya (Next Step)
 

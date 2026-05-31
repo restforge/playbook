@@ -1,14 +1,14 @@
 # Skenario 12: Aplikasi Frontend Multi-Page visitor_categories dan visitors
 
-> Tahap kedua belas onboarding RESTForge. Menggabungkan dua resource (`visitor_categories` dan `visitors`) ke dalam satu aplikasi frontend multi-page. Halaman `visitors` dilengkapi dropdown kategori yang memuat data dari endpoint `visitor-categories/lookup`, sehingga proses berurutan: tambah kategori terlebih dahulu, lalu create/update visitor dengan memilih kategori tersebut.
+> Tahap kedua belas onboarding RESTForge. Menggabungkan dua resource (`visitor_categories` dan `visitors`) ke dalam satu aplikasi frontend multi-page. Command `payload migrate` melakukan auto-discovery tabel JOIN: migrasi RDF `visitors.json` (yang sudah JOIN ke `visitor_categories` pada Skenario 11) menghasilkan UDF multi-page secara otomatis, lengkap dengan dropdown kategori dan navigasi sidebar. Proses berurutan tetap berlaku: tambah kategori terlebih dahulu, lalu create/update visitor dengan memilih kategori tersebut.
 
 ---
 
 ## Tujuan (Objective)
 
-1. RDF `visitor-categories.json` dan `visitors.json` di-migrate menjadi dua UDF di `sandbox\frontend\payload`
-2. UDF digabung menjadi satu aplikasi multi-page (`app-config.json` + `pages\*.json` + `visitors-app.json`) dengan sidebar navigasi
-3. Field `category_id` pada halaman `visitors` dikonfigurasi sebagai dropdown `select` yang memuat opsi dari endpoint `visitor-categories/lookup`
+1. RDF `visitors.json` (dengan JOIN ke `visitor_categories`) di-migrate menjadi UDF multi-page secara otomatis melalui auto-discovery JOIN, tanpa penyusunan manual
+2. Hasil migrate berbentuk struktur split: `app-config.json` + `pages\visitor-categories.json` + `pages\visitors.json` + aggregator `visitors-app.json` dengan sidebar navigasi dua page
+3. Field `category_id` pada halaman `visitors` otomatis ter-konfigurasi sebagai dropdown `select` yang memuat opsi dari endpoint `visitor-categories/lookup`
 4. Aplikasi frontend ter-generate ke `sandbox\frontend\apps\visitors-app` dengan halaman `visitor-categories.html` dan `visitors.html`
 5. Verifikasi end-to-end berurutan di browser: tambah kategori → create/update visitor (pilih kategori) → list `visitors` menampilkan `category_name`
 
@@ -18,9 +18,10 @@
 
 | Item | Cara Verifikasi |
 |------|-----------------|
-| Skenario 10 & 11 selesai | Endpoint `visitor-categories` dan `visitors` (dengan JOIN kategori) aktif; RDF `payload\visitors.json` memuat `category_code` & `category_name` |
+| Skenario 10 & 11 selesai | Endpoint `visitor-categories` dan `visitors` (dengan JOIN kategori) aktif; RDF `payload\visitors.json` memuat `category_code` & `category_name` serta `datatablesQuery` JOIN |
+| RDF `visitor-categories.json` tersedia sebagai sibling | File `payload\visitor-categories.json` ada di folder yang sama dengan `payload\visitors.json`. Auto-discovery memuat RDF ini dari sibling folder saat memproses JOIN; bila tidak ada, page kategori tidak ter-generate dan hanya referensi `select` yang dipertahankan |
 | `fieldNameLookup` visitor_categories aktif | RDF `payload\visitor-categories.json` memuat `fieldNameLookup` (langkah opsional Skenario 10) — wajib agar endpoint `/lookup` mengembalikan `id` + `text` untuk dropdown |
-| Skenario 8 selesai | License RESTForge Designer aktif (`restforge-designer license status` → `valid`); `restforge-designer --version` dapat dipanggil |
+| Skenario 8 selesai | License RESTForge Designer aktif (`restforge-designer license status` → `valid`); `restforge-designer --version` dapat dipanggil. Struktur UDF single-page dari Skenario 8 sudah ada di `sandbox\frontend\payload` (akan ditimpa) |
 | Working directory awal | `sandbox\backend`, path berakhiran `\playbook\sandbox\backend` |
 
 ---
@@ -39,119 +40,87 @@
 
 ## Langkah Eksekusi (Execution Steps)
 
-> Urutan langkah bersifat ketat: `visitor_categories` adalah master, `visitors` bergantung padanya. Migrate dan susun kategori lebih dulu, baru `visitors`.
+> Karena RDF `visitors` sudah JOIN ke `visitor_categories` (Skenario 11), satu perintah migrate menghasilkan aplikasi dua-page lengkap tanpa penyusunan multi-page manual.
 
-### Langkah 1: Migrate Kedua RDF ke UDF
+### Langkah 1: Migrate visitors.json (Auto Multi-Page)
 
-Dari `sandbox\backend`, migrate kategori lebih dulu, lalu visitors. Flag `--overwrite` diperlukan karena `visitors.json` sudah ada dari Skenario 8:
+Dari `sandbox\backend`, jalankan migrate **hanya** untuk `visitors.json`. Flag `--overwrite` diperlukan karena struktur UDF dari Skenario 8 sudah ada di output folder:
 
 ```bat
-npx restforge payload migrate --project=visitors-app --name=visitor-categories.json --output=..\frontend\payload --config=db-connection.env --overwrite
-npx restforge payload migrate --project=visitors-app --name=visitors.json --output=..\frontend\payload --config=db-connection.env --overwrite
+npx restforge payload migrate --project=visitors-app --name=visitors.json --output=../frontend/payload --config=db-connection.env --overwrite
 ```
 
-Setiap perintah menghasilkan UDF single-page (`Pages: 1`). Output `visitors` kini menyertakan `category_id`; kolom display JOIN (`category_code`, `category_name`) di-exclude dari form sesuai aturan migrasi.
+Migrator membaca `datatablesQuery` pada RDF `visitors`, mendeteksi JOIN ke `visitor_categories`, lalu memuat RDF `visitor-categories.json` dari folder payload yang sama dan mengkonversinya menjadi page tersendiri. Output menampilkan `Pages: 2`:
+
+```
+============================================================
+PAYLOAD MIGRATE - RDF (backend) -> UDF (frontend, split)
+============================================================
+
+  Input        : ...\sandbox\backend\payload\visitors.json
+  Output dir   : ...\sandbox\frontend\payload
+  Project      : visitors-app
+  apiBaseUrl   : http://127.0.0.1:3000/api/visitors-app
+  Backend port : 3000
+  Frontend port: 8000
+  Homepage     : visitors
+  Pages        : 2
+
+  [OK] visitor-categories: 6 field(s), 0 table column(s)
+  [OK] visitors: 4 field(s), 4 table column(s)
+
+  Files written:
+    - app-config.json
+    - pages\visitor-categories.json
+    - pages\visitors.json
+    - visitors-app.json
+
+  Migration completed successfully.
+```
+
+> **Penting:** cukup migrate `visitors.json` saja. Jangan migrate `visitor-categories.json` secara terpisah ke project yang sama. Setiap migrate menulis ulang aggregator `visitors-app.json` untuk RDF utamanya masing-masing, sehingga migrate terpisah akan saling menimpa dan menyisakan aggregator single-page. Page `visitor-categories` sudah otomatis terbentuk via auto-discovery JOIN, dengan urutan benar (master lebih dulu, `visitors` sebagai homepage di urutan terakhir).
 
 ---
 
-### Langkah 2: Susun Struktur Multi-Page
+### Langkah 2: Tinjau Hasil Auto-Generate
 
-Pindah ke folder payload frontend (`sandbox\frontend\payload`), lalu buat folder `pages`:
+Seluruh struktur terbentuk otomatis dari migrate. Pindah ke folder payload frontend untuk memeriksanya:
 
 ```bat
-mkdir pages
+dir ..\frontend\payload
+dir ..\frontend\payload\pages
 ```
 
-Setiap hasil migrate berbentuk `{ "appConfig": { ... }, "pages": [ ... ] }`. Susun struktur multi-page dengan memisahkan tiap hasil migrate:
+Struktur yang terbentuk:
 
-- blok `appConfig` (sama untuk semua page) diekstrak **sekali** ke `app-config.json`
-- tiap file hasil migrate **dipindahkan ke folder `pages\`**, lalu blok `appConfig`-nya dihapus (sisakan blok `pages`)
+| File | Isi |
+|------|-----|
+| `app-config.json` | Blok `appConfig` bersama (appName, appCode, plugin, apiBaseUrl, port) |
+| `pages\visitor-categories.json` | Page kategori (6 field: `category_code`, `category_name`, `description`, `default_duration_hours`, `requires_escort`, `is_active`) dengan `enableStatusFilter` otomatis dari `is_active` |
+| `pages\visitors.json` | Page visitors dengan `category_id` sebagai dropdown `select` (lihat di bawah) |
+| `visitors-app.json` | Aggregator: `extends` ke `app-config.json`, `homepage: visitors`, `include` kedua page, dan `navigation` dua item |
 
-Nama file hasil migrate sudah sama dengan nama fragmen target (mis. `visitor-categories.json` menjadi `pages\visitor-categories.json`), sehingga langkahnya benar-benar memindahkan file ke subfolder `pages\` dan membuang `appConfig`. Karena `pages` pada hasil migrate sudah berupa array, file di `pages\` otomatis berbentuk `{ "pages": [ ... ] }` yang valid untuk `include` tanpa perlu dibungkus ulang. Loader `include` membaca array `pages` dari file yang direferensikan; file tanpa array `pages` ditolak dengan error `does not contain a valid 'pages' array`.
-
-**a. Buat `app-config.json`** — salin salah satu hasil migrate, lalu hapus blok `pages` (sisakan `appConfig`):
+**Dropdown kategori otomatis.** Field FK `category_id` yang ber-JOIN otomatis dikonversi menjadi dropdown `select` dengan `dataSource` API. Isi `pages\visitors.json` pada bagian `category_id`:
 
 ```json
 {
-    "appConfig": {
-        "appName": "Visitors App",
-        "appCode": "visitors-app",
-        "plugin": "vanilla-js-basic",
-        "apiBaseUrl": "http://127.0.0.1:3000/api/visitors-app",
-        "port": 8000
+    "name": "category_id",
+    "label": "Category",
+    "type": "select",
+    "inTable": true,
+    "tableOrder": 6,
+    "tableField": "category_name",
+    "dataSource": {
+        "type": "api",
+        "resource": "visitor-categories",
+        "select": ["category_id", "category_name"]
     }
 }
 ```
 
-**b. Buat `pages\visitor-categories.json`** — salin hasil migrate `visitor-categories.json`, lalu hapus blok `appConfig` (sisakan blok `pages`). Hasilnya langsung berbentuk seperti berikut:
+`resource: "visitor-categories"` menghasilkan request `POST /api/visitors-app/visitor-categories/lookup`. `tableField: "category_name"` membuat DataTable menampilkan nama kategori (bukan UUID `category_id`). `select` diambil dari kolom JOIN aktual (`category_id`, `category_name`), bukan tebakan.
 
-```json
-{
-    "pages": [
-        {
-            "pageId": "visitor-categories",
-            "pageTitle": "Visitor Categories",
-            "apiPath": "visitor-categories",
-            "primaryKey": "category_id",
-            "displayField": "category_name",
-            "features": { "enableSearch": true, "fieldLayout": "vertical" },
-            "fields": [ "... hasil migrate: category_code, category_name, description, default_duration_hours, requires_escort, is_active ..." ]
-        }
-    ]
-}
-```
-
-**c. Buat `pages\visitors.json`** — salin hasil migrate `visitors.json`, hapus blok `appConfig`, lalu konfigurasi `category_id` sebagai dropdown (lihat Langkah 3).
-
----
-
-### Langkah 3: Konfigurasi Dropdown Kategori
-
-Pada `pages\visitors.json`, pastikan field `category_id` bertipe `select` dengan `dataSource` API ke resource `visitor-categories`. Konfigurasi eksplisit ini memastikan field `category_id` tampil sebagai dropdown kategori pada form sehingga update visitor dapat memilih kategori:
-
-```json
-{
-    "pages": [
-        {
-            "pageId": "visitors",
-            "pageTitle": "Visitors",
-            "apiPath": "visitors",
-            "primaryKey": "visitor_id",
-            "displayField": "name",
-            "features": { "enableSearch": true, "fieldLayout": "vertical" },
-            "fields": [
-                { "name": "name",  "label": "Name",  "type": "text", "required": true, "maxlength": 100, "inTable": true, "tableOrder": 1 },
-                { "name": "email", "label": "Email", "type": "text", "required": true, "maxlength": 100, "inTable": true, "tableOrder": 2 },
-                { "name": "phone", "label": "Phone", "type": "text", "required": true, "maxlength": 20, "inTable": true, "tableOrder": 3 },
-                {
-                    "name": "category_id",
-                    "label": "Category",
-                    "type": "select",
-                    "required": false,
-                    "inTable": true,
-                    "tableOrder": 4,
-                    "tableField": "category_name",
-                    "dataSource": {
-                        "type": "api",
-                        "resource": "visitor-categories",
-                        "select": ["category_id", "category_name"]
-                    }
-                }
-            ]
-        }
-    ]
-}
-```
-
-`tableField: "category_name"` membuat DataTable menampilkan nama kategori (bukan UUID `category_id`). `resource: "visitor-categories"` menghasilkan request `POST /api/visitors-app/visitor-categories/lookup`.
-
-> **Penting (perilaku `inTable`):** default `inTable` adalah `false`. Selama tidak ada satu pun field ber-`inTable`, DataTable menampilkan seluruh field (mode fallback). Namun begitu satu field diberi `inTable: true`, tabel beralih ke mode opt-in: **hanya** field ber-`inTable: true` yang muncul sebagai kolom. Karena itu `name`, `email`, dan `phone` wajib diberi `inTable: true` + `tableOrder` juga; bila tidak, grid hanya menampilkan kolom `Category` (kolom lain hilang) meskipun data lengkap ada di response API. Setiap field ber-`inTable: true` sebaiknya disertai `tableOrder` agar urutan kolom terprediksi dan tidak memunculkan warning.
-
----
-
-### Langkah 4: Buat UDF Utama Multi-Page
-
-Buat `visitors-app.json` di `sandbox\frontend\payload` sebagai UDF gabungan. File ini menarik `appConfig` via `extends`, menyusun kedua page via `include`, dan mendefinisikan sidebar:
+**Aggregator otomatis.** Isi `visitors-app.json`:
 
 ```json
 {
@@ -163,33 +132,46 @@ Buat `visitors-app.json` di `sandbox\frontend\payload` sebagai UDF gabungan. Fil
     ],
     "navigation": {
         "items": [
-            { "type": "page", "pageRef": "visitor-categories", "icon": "database", "label": "Visitor Categories" },
-            { "type": "page", "pageRef": "visitors",            "icon": "users",    "label": "Visitors" }
+            { "type": "page", "pageRef": "visitor-categories", "label": "Visitor Categories" },
+            { "type": "page", "pageRef": "visitors",            "label": "Visitors" }
         ]
     }
 }
 ```
 
-Pindah kembali ke `sandbox\frontend` (naik satu level dari folder `payload`), lalu validasi sebelum generate:
+> **Catatan (perilaku `inTable`):** default `inTable` adalah `false`. Selama tidak ada satu pun field ber-`inTable`, DataTable menampilkan seluruh field (mode fallback) — kondisi ini berlaku pada page `visitor-categories` (output `0 table column(s)`). Pada page `visitors`, migrator menetapkan `inTable: true` + `tableOrder` pada `name`, `email`, `phone`, dan `category_id` berdasarkan urutan kolom di `datatablesQuery` (output `4 table column(s)`), sehingga keempat kolom muncul terprediksi tanpa warning. Gap pada `tableOrder` (mis. 1, 2, 3, 6) hanya menentukan urutan relatif dan tidak menimbulkan masalah.
+
+**Kustomisasi opsional.** Bila diperlukan penyesuaian (mis. label, icon, urutan kolom, `pageSubtitle`, atau menambah `navigation.icon`), edit langsung fragmen di `pages\` atau aggregator `visitors-app.json` setelah migrate, lalu lanjut ke validasi dan generate. Penambahan `icon` pada navigation, contohnya:
+
+```json
+{ "type": "page", "pageRef": "visitor-categories", "icon": "database", "label": "Visitor Categories" },
+{ "type": "page", "pageRef": "visitors",            "icon": "users",    "label": "Visitors" }
+```
+
+---
+
+### Langkah 3: Validasi UDF
+
+Pindah ke `sandbox\frontend` (naik satu level dari folder `payload`), lalu validasi aggregator sebelum generate:
 
 ```bat
 restforge-designer validate --payload=payload/visitors-app.json
 ```
 
-Validasi harus lolos tanpa error. Error `pageRef ... does not match any pageId` menandakan `include` gagal atau `pageId` tidak sesuai.
+Validasi harus lolos tanpa error. Error `pageRef ... does not match any pageId` menandakan `include` gagal atau `pageId` tidak sesuai. Error `does not contain a valid 'pages' array` menandakan fragmen di `pages\` kehilangan pembungkus array `pages`.
 
 ---
 
-### Langkah 5: Generate Aplikasi Frontend
+### Langkah 4: Generate Aplikasi Frontend
 
-Dari `sandbox\frontend`. Hapus dulu `index.html` lama hasil Skenario 8 sebelum generate, karena `--overwrite` menimpa file page (HTML/JS) tetapi tidak meregenerasi `index.html` yang sudah ada:
+Dari `sandbox\frontend`. Skenario 8 menghasilkan aplikasi single-page (hanya `visitors`), sehingga set halaman berubah dari satu menjadi dua. Karena `--overwrite` menimpa file page (HTML/JS) tetapi **tidak** meregenerasi `index.html` yang sudah ada, hapus dulu `index.html` lama agar landing page diregenerasi sesuai set page baru:
 
 ```bat
 del apps\visitors-app\index.html
 restforge-designer generate --payload=payload/visitors-app.json --output=./apps/visitors-app --overwrite
 ```
 
-Tanpa menghapus `index.html`, landing page lama (single-page, hanya card `Visitors`) akan tetap muncul karena generator tidak menimpa `index.html` yang sudah ada. Setelah dihapus, generator membuat ulang `index.html` sebagai landing multi-page berisi card `Visitor Categories` dan `Visitors`. Flag `--overwrite` sendiri menimpa file page `visitors` dari Skenario 8 dan menambahkan page `visitor-categories`.
+Tanpa menghapus `index.html`, landing page lama (hanya card `Visitors`) akan tetap muncul. Setelah dihapus, generator membuat ulang `index.html` sebagai landing multi-page berisi card `Visitor Categories` dan `Visitors`. Flag `--payload` selalu menunjuk ke aggregator `visitors-app.json`, bukan ke fragmen `pages\<page>.json`.
 
 Verifikasi hasil:
 
@@ -201,7 +183,7 @@ Output memuat shared files (`index.html`, `app-start.bat`, folder `js\`, `css\`)
 
 ---
 
-### Langkah 6: Run dan Verifikasi Berurutan
+### Langkah 5: Run dan Verifikasi Berurutan
 
 Pastikan backend server running pada cmd pertama. Skenario 12 hanya mengubah frontend; endpoint backend (`visitors` dan `visitor-categories`) sudah final sejak Skenario 10-11, sehingga server cukup dipastikan aktif di port `3000`, bukan di-refresh:
 
@@ -240,9 +222,9 @@ Catatan urutan: dropdown kategori kosong apabila belum ada record `visitor_categ
 
 ---
 
-### Langkah 7: Data Contoh Visitor Categories
+### Langkah 6: Data Contoh Visitor Categories
 
-Sebagai bahan pengisian saat Create kategori pada Langkah 6, berikut contoh data `visitor_categories` yang dapat dimasukkan melalui form **Visitor Categories**. Kolom `Status` dibiarkan default (Active):
+Sebagai bahan pengisian saat Create kategori pada Langkah 5, berikut contoh data `visitor_categories` yang dapat dimasukkan melalui form **Visitor Categories**. Kolom `Status` dibiarkan default (Active):
 
 | Category Code | Category Name | Description | Default Duration Hours | Requires Escort |
 |---------------|---------------|-------------|------------------------|-----------------|

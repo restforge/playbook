@@ -1,12 +1,12 @@
 # Skenario 8: Migrasi RDF ke UDF dan Generate Aplikasi Frontend
 
-> Tahap kedelapan onboarding RESTForge. Migrasi payload backend (RDF) menjadi payload frontend (UDF), aktivasi license RESTForge Designer pada workspace frontend, lalu generate aplikasi frontend (HTML/JS/CSS) dari UDF tersebut.
+> Tahap kedelapan onboarding RESTForge. Migrasi payload backend (RDF) menjadi payload frontend (UDF), aktivasi license RESTForge Designer pada workspace frontend, lalu generate aplikasi frontend (HTML/JS/CSS) dari UDF tersebut. Command `payload migrate` menghasilkan UDF dalam format split multi-file secara default.
 
 ---
 
 ## Tujuan (Objective)
 
-1. File UDF `sandbox\frontend\payload\visitors.json` ter-generate sebagai hasil konversi dari RDF `sandbox\backend\payload\visitors.json`
+1. Struktur UDF split ter-generate di folder `sandbox\frontend\payload\` sebagai hasil konversi dari RDF `sandbox\backend\payload\visitors.json`, terdiri atas `app-config.json`, `pages\visitors.json`, dan aggregator `visitors-app.json`
 2. License RESTForge Designer berstatus aktif (valid) pada mesin
 3. Aplikasi frontend ter-generate ke folder `sandbox\frontend\apps\visitors-app\` berisi file HTML, JS, CSS, dan asset plugin
 
@@ -42,35 +42,53 @@ Catatan instalasi RESTForge Designer: installer resmi tersedia pada [https://res
 Pastikan working directory berada di `sandbox\backend`, lalu jalankan command migrate:
 
 ```bat
-npx restforge payload migrate --name=visitors.json --project=visitors-app --output=../frontend/payload --config=db-connection.env
+npx restforge payload migrate --project=visitors-app --name=visitors.json --output=../frontend/payload --config=db-connection.env
 ```
 
-Output yang diharapkan menampilkan ringkasan migrasi:
+Output yang diharapkan menampilkan ringkasan migrasi beserta daftar file yang ditulis:
 
 ```
 ============================================================
-PAYLOAD MIGRATE - RDF (backend) -> UDF (frontend)
+PAYLOAD MIGRATE - RDF (backend) -> UDF (frontend, split)
 ============================================================
 
   Input        : ...\sandbox\backend\payload\visitors.json
-  Output       : ...\sandbox\frontend\payload\visitors.json
+  Output dir   : ...\sandbox\frontend\payload
   Project      : visitors-app
   apiBaseUrl   : http://127.0.0.1:3000/api/visitors-app
-  Port         : 3000
+  Backend port : 3000
+  Frontend port: 8000
+  Homepage     : visitors
   Pages        : 1
 
   [OK] visitors: 3 field(s), 3 table column(s)
 
+  Files written:
+    - app-config.json
+    - pages\visitors.json
+    - visitors-app.json
+
   Migration completed successfully.
 ```
 
-Verifikasi file UDF ter-create:
+Command menulis struktur split multi-file ke `Output dir`:
+
+| File | Isi |
+|------|-----|
+| `app-config.json` | Blok `appConfig` (appName, appCode, plugin, apiBaseUrl, port) yang dipakai bersama oleh seluruh page |
+| `pages\visitors.json` | Definisi page `visitors` (fields, features) dalam pembungkus `{ "pages": [ ... ] }` |
+| `visitors-app.json` | Aggregator bernama sesuai `--project`: menarik `appConfig` via `extends`, menyusun page via `include`, serta mendefinisikan `homepage` dan `navigation` |
+
+Verifikasi struktur UDF ter-create:
 
 ```bat
-dir ..\frontend\payload\visitors.json
+dir ..\frontend\payload
+dir ..\frontend\payload\pages
 ```
 
-Catatan: bila file output sudah ada dari eksekusi sebelumnya, tambahkan flag `--overwrite` untuk menimpa.
+`dir ..\frontend\payload` harus menampilkan `app-config.json`, `visitors-app.json`, dan folder `pages`, sedangkan `dir ..\frontend\payload\pages` menampilkan `visitors.json`.
+
+Catatan: bila file output sudah ada dari eksekusi sebelumnya, tambahkan flag `--overwrite` untuk menimpa seluruh file split tersebut.
 
 ---
 
@@ -130,10 +148,10 @@ Field `Validation` harus bernilai `valid` (atau `valid (cached)`). Bila bernilai
 
 ### Langkah 4: Generate Aplikasi Frontend dari UDF
 
-Dari working directory `sandbox\frontend`, jalankan command generate:
+Dari working directory `sandbox\frontend`, jalankan command generate. Flag `--payload` menunjuk ke aggregator `visitors-app.json`, bukan ke fragmen `pages\visitors.json`. Aggregator inilah yang memuat `appConfig` (via `extends`) dan merangkai seluruh page (via `include`); fragmen di folder `pages\` tidak memuat `appConfig` sehingga tidak dapat dijadikan payload langsung:
 
 ```bat
-restforge-designer generate --payload=payload/visitors.json --output=./apps/visitors-app --overwrite
+restforge-designer generate --payload=payload/visitors-app.json --output=./apps/visitors-app --overwrite
 ```
 
 Output menampilkan ringkasan jumlah file yang ditulis dan daftar warning (jika ada).

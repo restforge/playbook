@@ -61,13 +61,11 @@ cd playbook\sandbox\backend
 
 ### Langkah 2: Generate Starter Files
 
-Verb global `init` akan men-generate tiga file berikut di working directory:
+Verb global `init` akan men-generate satu file berikut di working directory:
 
 | Path | Keterangan |
 |------|-----------|
 | `config\db-connection.env` | Template database connection config |
-| `payload\samples.json` | Sample payload untuk tabel `contact` |
-| `payload\query\samples-datatables.sql` | Sample SQL query untuk datatables endpoint |
 
 Eksekusi perintah:
 
